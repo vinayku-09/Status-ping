@@ -1,0 +1,281 @@
+// StatusPing Database Schema
+// PostgreSQL database with comprehensive uptime monitoring data model
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+
+
+/// User account with email/password authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String   // bcrypt hash
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  monitors Monitor[]
+
+  @@map("User")
+}
+
+
+// Monitor Configuration
+
+
+/// HTTP/HTTPS endpoint monitor configuration
+model Monitor {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Monitor details
+  name                 String    @db.VarChar(100)
+  url                  String
+  
+  // Check configuration
+  checkIntervalMinutes Int       @default(5)
+  failureThreshold     Int       @default(2)
+  timeoutSeconds       Int       @default(10)
+  keywordCheck         String?   @db.VarChar(200)
+  
+  // Status tracking
+  status               String    @default("pending") // pending | active | degraded | down | paused
+  consecutiveFailures  Int       @default(0)
+  lastCheckedAt        DateTime?
+  
+  // Settings
+  statusPageVisible    Boolean   @default(true)
+  
+  // Soft delete
+  deletedAt            DateTime?
+  
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  pingLogs            PingLog[]
+  incidents           Incident[]
+  notificationConfigs NotificationConfig[]
+  sslChecks           SslCheck[]
+  dailyStats          DailyStat[]
+
+  // Indexes for performance
+  @@index([userId, deletedAt])
+  @@index([status, deletedAt])
+  @@index([lastCheckedAt])
+  @@map("Monitor")
+}
+
+
+// Ping Execution Logs
+
+
+/// Individual ping execution result
+model PingLog {
+  id             Int      @id @default(autoincrement())
+  monitorId      String
+  monitor        Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  
+  checkedAt      DateTime @default(now())
+  isUp           Boolean
+  statusCode     Int?
+  responseTimeMs Int?
+  
+  // Error details
+  errorType      String?  // TIMEOUT | DNS_FAILURE | CONNECTION_REFUSED | SSL_ERROR | REDIRECT_LIMIT | HTTP_ERROR
+  
+  // Redirect tracking
+  redirectCount  Int      @default(0)
+  finalUrl       String?
+
+  // Indexes for query performance
+  @@index([monitorId, checkedAt(sort: Desc)])
+  @@index([checkedAt])
+  @@map("PingLog")
+}
+
+
+// Daily Statistics Aggregation
+
+
+/// Daily aggregated statistics per monitor
+model DailyStat {
+  id               Int      @id @default(autoincrement())
+  monitorId        String
+  monitor          Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  
+  statDate         DateTime @db.Date
+  
+  // Aggregated metrics
+  totalChecks      Int      @default(0)
+  successfulChecks Int      @default(0)
+  uptimePercent    Decimal? @db.Decimal(5, 2)
+  
+  // Response time percentiles
+  p50Ms            Int?
+  p95Ms            Int?
+  p99Ms            Int?
+  
+  createdAt        DateTime @default(now())
+
+  @@unique([monitorId, statDate])
+  @@index([statDate])
+  @@map("DailyStat")
+}
+
+
+// Incident Management
+
+
+/// Downtime incident tracking
+/// NOTE: A partial unique index for open incidents is added via migration:
+/// CREATE UNIQUE INDEX "incidents_monitor_open_unique"
+/// ON "Incident"("monitorId") WHERE status = 'open' AND "deletedAt" IS NULL;
+/// This prevents duplicate open incidents per monitor at the database level.
+model Incident {
+  id              String    @id @default(cuid())
+  monitorId       String
+  monitor         Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  
+  status          String    @default("open") // open | resolved
+  
+  // Timing
+  startedAt       DateTime  @default(now())
+  resolvedAt      DateTime?
+  durationSeconds Int?      // computed on resolution
+  
+  // Details
+  rootCause       String?   @db.Text
+  errorType       String?
+  
+  // Soft delete
+  deletedAt       DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  notificationLogs NotificationLog[]
+
+  @@index([monitorId, status, deletedAt])
+  @@index([status, startedAt])
+  @@map("Incident")
+}
+
+
+// Notification Configuration
+
+
+/// Notification channel configuration (email or webhook)
+model NotificationConfig {
+  id               String    @id @default(cuid())
+  monitorId        String
+  monitor          Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  userId           String
+  
+  type             String    // email | webhook
+  
+  // Email configuration
+  email            String?
+  
+  // Webhook configuration
+  webhookUrl       String?
+  webhookSecretEnc String?   @db.Text // AES-256-GCM encrypted secret
+  
+  // Notification preferences
+  onIncidentOpen   Boolean   @default(true)
+  onIncidentResolve Boolean  @default(true)
+  
+  // Soft delete
+  deletedAt        DateTime?
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  notificationLogs NotificationLog[]
+
+  @@index([monitorId, deletedAt])
+  @@map("NotificationConfig")
+}
+
+
+// Notification Delivery Logs
+
+
+/// Notification delivery attempt log
+model NotificationLog {
+  id                   Int                 @id @default(autoincrement())
+  notificationConfigId String
+  notificationConfig   NotificationConfig  @relation(fields: [notificationConfigId], references: [id], onDelete: Cascade)
+  incidentId           String
+  incident             Incident            @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  
+  eventType            String              // opened | resolved
+  status               String              // pending | delivered | failed | suppressed
+  
+  // Delivery tracking
+  attempts             Int                 @default(0)
+  lastAttemptAt        DateTime?
+  deliveredAt          DateTime?
+  errorMessage         String?             @db.Text
+  
+  createdAt            DateTime            @default(now())
+
+  @@index([notificationConfigId, createdAt])
+  @@index([incidentId])
+  @@index([status, createdAt])
+  @@map("NotificationLog")
+}
+
+
+// SSL Certificate Monitoring
+
+
+/// SSL certificate check result
+model SslCheck {
+  id            Int       @id @default(autoincrement())
+  monitorId     String
+  monitor       Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  
+  checkedAt     DateTime  @default(now())
+  
+  // Certificate details
+  expiresAt     DateTime?
+  daysRemaining Int?
+  issuer        String?   @db.VarChar(255)
+  
+  // Validation
+  isValid       Boolean
+  errorMessage  String?   @db.Text
+
+  @@index([monitorId, checkedAt(sort: Desc)])
+  @@map("SslCheck")
+}
+
+
+// Dead Letter Queue
+
+
+/// Failed jobs for manual replay
+model DeadLetterJob {
+  id           Int       @id @default(autoincrement())
+  queueName    String
+  jobId        String?
+  jobData      Json
+  errorMessage String?   @db.Text
+  attempts     Int
+  failedAt     DateTime  @default(now())
+  replayedAt   DateTime?
+
+  @@index([queueName, failedAt])
+  @@index([replayedAt])
+  @@map("DeadLetterJob")
+}
