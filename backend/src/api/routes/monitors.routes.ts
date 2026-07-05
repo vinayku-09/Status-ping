@@ -23,9 +23,9 @@ import { createLogger } from '../../lib/logger.js';
 const router = Router();
 const logger = createLogger('api', 'monitors-routes');
 
-// ============================================
+====
 // Validation Schemas
-// ============================================
+====
 
 const CreateMonitorSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
@@ -66,9 +66,9 @@ const DeleteMonitorSchema = z.object({
   force: z.coerce.boolean().default(false),
 });
 
-// ============================================
+====
 // Helper Functions
-// ============================================
+====
 
 /**
  * Calculate 30-day uptime for a monitor from daily stats
@@ -112,9 +112,9 @@ async function verifyMonitorOwnership(monitorId: string, userId: string) {
   return monitor;
 }
 
-// ============================================
+====
 // Routes
-// ============================================
+====
 
 /**
  * GET /api/monitors
