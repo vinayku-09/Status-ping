@@ -1,0 +1,117 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: statusping-postgres
+    environment:
+      POSTGRES_DB: statusping
+      POSTGRES_USER: statusping
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U statusping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - statusping
+
+  redis:
+    image: redis:7-alpine
+    container_name: statusping-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - statusping
+
+  api:
+    build:
+      context: .
+      target: api
+    container_name: statusping-api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://statusping:password@postgres:5432/statusping
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY}
+      PING_WORKER_CONCURRENCY: ${PING_WORKER_CONCURRENCY:-10}
+      NOTIFICATION_COOLDOWN_SECONDS: ${NOTIFICATION_COOLDOWN_SECONDS:-1800}
+      PING_LOG_RETENTION_DAYS: ${PING_LOG_RETENTION_DAYS:-30}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && node dist/api/server.js"
+    restart: unless-stopped
+    networks:
+      - statusping
+    profiles:
+      - full
+
+  worker:
+    build:
+      context: .
+      target: worker
+    container_name: statusping-worker
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://statusping:password@postgres:5432/statusping
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: ${NODE_ENV:-production}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      WEBHOOK_ENCRYPTION_KEY: ${WEBHOOK_ENCRYPTION_KEY}
+      PING_WORKER_CONCURRENCY: ${PING_WORKER_CONCURRENCY:-10}
+      NOTIFICATION_COOLDOWN_SECONDS: ${NOTIFICATION_COOLDOWN_SECONDS:-1800}
+      PING_LOG_RETENTION_DAYS: ${PING_LOG_RETENTION_DAYS:-30}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: node dist/worker/index.js
+    restart: unless-stopped
+    networks:
+      - statusping
+    profiles:
+      - full
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  statusping:
+    driver: bridge
