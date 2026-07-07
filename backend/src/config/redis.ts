@@ -55,12 +55,52 @@ redis.on('end', () => {
  */
 export async function connectRedis(): Promise<void> {
   try {
+    if (redis.status === 'ready') {
+      logger.info('Redis already connected');
+      return;
+    }
+
+    if (redis.status === 'connecting' || redis.status === 'connect' || redis.status === 'reconnecting') {
+      await waitForRedisReady();
+      logger.info('Redis connected successfully');
+      return;
+    }
+
     await redis.connect();
     logger.info('Redis connected successfully');
   } catch (error) {
     logger.error({ err: error }, 'Failed to connect to Redis');
     throw error;
   }
+}
+
+function waitForRedisReady(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      redis.off('ready', handleReady);
+      redis.off('error', handleError);
+      redis.off('end', handleEnd);
+    };
+
+    const handleReady = () => {
+      cleanup();
+      resolve();
+    };
+
+    const handleError = (error: Error) => {
+      cleanup();
+      reject(error);
+    };
+
+    const handleEnd = () => {
+      cleanup();
+      reject(new Error('Redis connection ended before becoming ready'));
+    };
+
+    redis.once('ready', handleReady);
+    redis.once('error', handleError);
+    redis.once('end', handleEnd);
+  });
 }
 
 /**

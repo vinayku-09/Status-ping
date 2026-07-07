@@ -112,8 +112,9 @@ export async function checkSsl(url: string): Promise<SslResult> {
             const expiresAt = new Date(cert.valid_to);
             const daysRemaining = calculateDaysRemaining(expiresAt);
 
-            // Extract issuer information
-            const issuer = cert.issuer?.O || cert.issuer?.CN || 'Unknown';
+            // Extract issuer information (cert fields may be string or string[])
+            const rawIssuer = cert.issuer?.O || cert.issuer?.CN || 'Unknown';
+            const issuer = Array.isArray(rawIssuer) ? rawIssuer.join(', ') : rawIssuer;
 
             socket.destroy();
 

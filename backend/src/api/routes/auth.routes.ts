@@ -18,7 +18,7 @@ import {
 import { JwtPayload, ApiResponse } from '../../types/index.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'auth-routes');
 
 // Validation Schemas
@@ -48,9 +48,11 @@ function generateToken(userId: string, email: string): string {
     email,
   };
 
-  return jwt.sign(payload, env.JWT_SECRET, {
-    expiresIn: env.JWT_EXPIRES_IN,
-  });
+  const options: jwt.SignOptions = {
+    expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
+  };
+
+  return jwt.sign(payload, env.JWT_SECRET, options);
 }
 
 /**

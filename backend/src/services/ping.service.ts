@@ -126,6 +126,19 @@ export async function executePing(monitor: Monitor): Promise<PingResult> {
 
       const responseTimeMs = Date.now() - startTime;
 
+      // No response was captured (e.g. redirect without a Location header)
+      if (finalStatusCode === null) {
+        logger.debug({ monitorId: monitor.id }, 'No HTTP response captured');
+        return {
+          isUp: false,
+          statusCode: null,
+          responseTimeMs,
+          errorType: 'HTTP_ERROR',
+          redirectCount,
+          finalUrl: currentUrl,
+        };
+      }
+
       // Check status code (2xx = success)
       const isStatusOk = finalStatusCode >= 200 && finalStatusCode < 300;
 

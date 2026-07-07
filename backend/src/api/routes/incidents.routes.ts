@@ -6,7 +6,7 @@ import { ApiResponse, PaginationMeta } from '../../types/index.js';
 import { updateIncidentRootCause } from '../../services/incident.service.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'incidents-routes');
 
 // Validation Schemas

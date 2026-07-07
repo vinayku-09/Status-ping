@@ -11,21 +11,19 @@ import { registerMonitorJob, removeMonitorJob, enqueueImmediatePing } from '../.
 import { validateUrl } from '../../lib/ssrf.js';
 import { calculateUptimeFromDailyStats } from '../../lib/uptime.js';
 import {
-  ValidationError,
   NotFoundError,
-  ForbiddenError,
   UnprocessableError,
   ConflictError,
 } from '../../lib/errors.js';
 import { ApiResponse, PaginationMeta } from '../../types/index.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'monitors-routes');
 
-====
+// ============================
 // Validation Schemas
-====
+// ============================
 
 const CreateMonitorSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
@@ -52,7 +50,11 @@ const CreateMonitorSchema = z.object({
   statusPageVisible: z.boolean().default(true),
 });
 
-const UpdateMonitorSchema = CreateMonitorSchema.partial();
+const UpdateMonitorSchema = CreateMonitorSchema.partial().extend({
+  // Only the pause/resume transitions are user-controllable; the other
+  // statuses (pending, degraded, down) are managed by the worker.
+  status: z.enum(['active', 'paused']).optional(),
+});
 
 const ListMonitorsSchema = z.object({
   status: z.enum(['pending', 'active', 'degraded', 'down', 'paused']).optional(),
@@ -66,9 +68,9 @@ const DeleteMonitorSchema = z.object({
   force: z.coerce.boolean().default(false),
 });
 
-====
+// ============================
 // Helper Functions
-====
+// ============================
 
 /**
  * Calculate 30-day uptime for a monitor from daily stats
@@ -112,9 +114,9 @@ async function verifyMonitorOwnership(monitorId: string, userId: string) {
   return monitor;
 }
 
-====
+// ============================
 // Routes
-====
+// ============================
 
 /**
  * GET /api/monitors

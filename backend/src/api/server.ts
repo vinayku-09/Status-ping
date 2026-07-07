@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import pinoHttp from 'pino-http';
 import { env } from '../config/env.js';
 import { connectDatabase, disconnectDatabase } from '../config/prisma.js';
@@ -33,7 +33,7 @@ function createApp() {
       autoLogging: {
         ignore: (req) => req.url === '/api/health', // Don't log health checks
       },
-      customLogLevel: (req, res, err) => {
+      customLogLevel: (_req, res, err) => {
         if (res.statusCode >= 500 || err) return 'error';
         if (res.statusCode >= 400) return 'warn';
         return 'info';
@@ -66,7 +66,7 @@ function createApp() {
 
     // Error Handlers
   // 404 handler
-  app.use((req: Request, res: Response) => {
+  app.use((_req: Request, res: Response) => {
     res.status(404).json({
       error: {
         code: 'NOT_FOUND',

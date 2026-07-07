@@ -4,7 +4,7 @@ import { redis } from '../../config/redis.js';
 import { ApiResponse } from '../../types/index.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'status-routes');
 
 // Cache key for status page data
@@ -36,7 +36,7 @@ function calculateOverallStatus(monitors: Array<{ status: string }>): OverallSta
   return 'operational';
 }
 
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
   try {
     logger.debug('Fetching status page data');
 
@@ -46,7 +46,8 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     if (cached) {
       logger.debug('Status page cache hit');
       const data = JSON.parse(cached);
-      return res.status(200).json(data);
+      res.status(200).json(data);
+      return;
     }
 
     logger.debug('Status page cache miss, fetching from database');

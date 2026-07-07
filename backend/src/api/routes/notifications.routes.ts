@@ -6,7 +6,7 @@ import { ApiResponse } from '../../types/index.js';
 import { encryptSecret, generateWebhookSecret } from '../../lib/crypto.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'notifications-routes');
 
 // Validation Schemas
@@ -163,7 +163,8 @@ router.post('/:id/notifications', async (req: Request, res: Response, next: Next
         data: config,
       };
 
-      return res.status(201).json(response);
+      res.status(201).json(response);
+      return;
     } else {
       // Generate and encrypt webhook secret
       webhookSecret = generateWebhookSecret();
@@ -204,7 +205,8 @@ router.post('/:id/notifications', async (req: Request, res: Response, next: Next
         },
       };
 
-      return res.status(201).json(response);
+      res.status(201).json(response);
+      return;
     }
   } catch (error) {
     logger.error({ err: error }, 'Error creating notification config');

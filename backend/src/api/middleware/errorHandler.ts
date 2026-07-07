@@ -27,7 +27,7 @@ export function errorHandler(
   err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void {
   // Handle custom application errors
   if (err instanceof AppError) {

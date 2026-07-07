@@ -2,7 +2,7 @@ import { Worker, Job } from 'bullmq';
 import { redis } from '../config/redis.js';
 import { prisma } from '../config/prisma.js';
 import { env } from '../config/env.js';
-import { incidentQueue, notificationQueue } from '../queues/index.js';
+import { incidentQueue } from '../queues/index.js';
 import { executePing } from '../services/ping.service.js';
 import { checkSsl, shouldCheckSsl } from '../services/ssl.service.js';
 import { createLogger } from '../lib/logger.js';

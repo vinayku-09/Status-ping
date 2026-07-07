@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma.js';
-import { NotFoundError, ForbiddenError } from '../../lib/errors.js';
-import { ApiResponse, PaginationMeta } from '../../types/index.js';
+import { NotFoundError } from '../../lib/errors.js';
+import { ApiResponse } from '../../types/index.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'ping-logs-routes');
 
 // Validation Schemas

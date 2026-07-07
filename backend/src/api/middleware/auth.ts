@@ -40,7 +40,7 @@ function extractToken(req: Request): string | null {
  * 
  * @throws {UnauthorizedError} If token is missing, invalid, or expired
  */
-export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function authMiddleware(req: Request, _res: Response, next: NextFunction): void {
   try {
     const token = extractToken(req);
 
@@ -82,7 +82,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
  * Optional authentication middleware
  * Attaches user to request if token is valid, but doesn't fail if missing
  */
-export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function optionalAuthMiddleware(req: Request, _res: Response, next: NextFunction): void {
   try {
     const token = extractToken(req);
 

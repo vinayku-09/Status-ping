@@ -1,12 +1,12 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { prisma } from '../../config/prisma.js';
 import { redis } from '../../config/redis.js';
 import { createLogger } from '../../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('api', 'health-routes');
 
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     let postgresStatus = 'disconnected';
     let redisStatus = 'disconnected';
