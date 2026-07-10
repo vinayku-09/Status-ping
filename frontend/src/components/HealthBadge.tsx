@@ -2,58 +2,68 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/apiClient';
-import { HealthResponse } from '@/lib/types';
+import { Tooltip } from './ui/Tooltip';
+import { StatusDot } from './ui/StatusDot';
 
-export default function HealthBadge() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [error, setError] = useState<boolean>(false);
+export function HealthBadge() {
+  const [health, setHealth] = useState<{
+    status: 'ok' | 'degraded' | 'error';
+    postgres: string;
+    redis: string;
+  } | null>(null);
 
   useEffect(() => {
-    const fetchHealth = async () => {
+    const checkHealth = async () => {
       try {
         const res = await api.getHealth();
         setHealth(res);
-        setError(false);
       } catch (err) {
-        setError(true);
-        setHealth(null);
+        setHealth({ status: 'error', postgres: 'disconnected', redis: 'disconnected' });
       }
     };
 
-    fetchHealth();
-    
-    // Poll every 60 seconds
-    const interval = setInterval(fetchHealth, 60000);
+    checkHealth();
+    const interval = setInterval(checkHealth, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  if (error || !health) {
-    return (
-      <div className="flex items-center space-x-1" title="API Unavailable">
-        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-        <span className="text-xs text-gray-500 hidden sm:inline-block">API Down</span>
-      </div>
-    );
-  }
+  if (!health) return null;
 
-  const getStatusColor = () => {
+  const getStatusString = () => {
     switch (health.status) {
-      case 'ok': return 'bg-green-500';
-      case 'degraded': return 'bg-yellow-500';
-      case 'error': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case 'ok': return 'operational';
+      case 'degraded': return 'degraded';
+      case 'error': return 'down';
+      default: return 'paused';
+    }
+  };
+
+  const getStatusText = () => {
+    switch (health.status) {
+      case 'ok': return 'All systems operational';
+      case 'degraded': return 'API degraded';
+      case 'error': return 'API outage';
+      default: return 'Unknown status';
     }
   };
 
   return (
-    <div 
-      className="flex items-center space-x-1" 
-      title={`API: ${health.status}\nPostgres: ${health.postgres}\nRedis: ${health.redis}`}
+    <Tooltip 
+      content={
+        <div className="flex flex-col gap-1">
+          <div className="font-semibold">{getStatusText()}</div>
+          <div className="text-[11px] text-[var(--color-text-secondary)]">PostgreSQL: {health.postgres}</div>
+          <div className="text-[11px] text-[var(--color-text-secondary)]">Redis: {health.redis}</div>
+        </div>
+      } 
+      position="bottom"
     >
-      <div className={`w-2 h-2 rounded-full ${getStatusColor()}`}></div>
-      <span className="text-xs text-gray-500 hidden sm:inline-block capitalize">
-        API {health.status}
-      </span>
-    </div>
+      <div className="flex items-center gap-2 px-2 py-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full hover:bg-[var(--color-surface-raised)] transition-colors cursor-default">
+        <StatusDot status={getStatusString()} size="sm" />
+        <span className="text-[12px] font-medium text-[var(--color-text-secondary)] hidden sm:inline-block">
+          {getStatusText()}
+        </span>
+      </div>
+    </Tooltip>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/apiClient';
 import { StatusPageData } from '@/lib/types';
-import Navbar from '@/components/Navbar';
+import { UptimeBars } from '@/components/ui/UptimeBars';
 
 export default function PublicStatusPage() {
   const [data, setData] = useState<StatusPageData | null>(null);
@@ -30,64 +30,81 @@ export default function PublicStatusPage() {
 
   if (isLoading) {
     return (
-      <>
-        <div className="text-center py-20 flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-      </>
+      <div className="flex justify-center items-center min-h-screen bg-[var(--color-canvas)]">
+        <div className="animate-spin rounded-full h-10 w-10 border-[3px] border-[var(--color-border)] border-t-[var(--color-brand)]"></div>
+      </div>
     );
   }
 
   if (error || !data) {
     return (
-      <>
-        <div className="text-center py-20 text-red-600">
+      <div className="flex justify-center items-center min-h-screen bg-[var(--color-canvas)]">
+        <div className="text-center py-20 text-[var(--color-down)] font-medium">
           {error || 'Unable to load status page'}
         </div>
-      </>
+      </div>
     );
   }
 
-  const getOverallStatusStyle = () => {
+  const getOverallStatusInfo = () => {
     switch (data.overallStatus) {
-      case 'operational': return 'bg-green-600';
-      case 'degraded': return 'bg-yellow-500';
-      case 'outage': return 'bg-red-600';
-      default: return 'bg-gray-500';
+      case 'operational': return { color: 'var(--color-up)', bg: 'var(--color-up-subtle)', text: 'All Systems Operational' };
+      case 'degraded': return { color: 'var(--color-degraded)', bg: 'var(--color-degraded-subtle)', text: 'Degraded Performance' };
+      case 'outage': return { color: 'var(--color-down)', bg: 'var(--color-down-subtle)', text: 'Major Outage' };
+      default: return { color: 'var(--color-text-secondary)', bg: 'var(--color-surface-raised)', text: 'Unknown Status' };
     }
   };
 
-  const getOverallStatusText = () => {
-    switch (data.overallStatus) {
-      case 'operational': return 'All Systems Operational';
-      case 'degraded': return 'Degraded Performance';
-      case 'outage': return 'Major Outage';
-      default: return 'Unknown Status';
-    }
-  };
+  const statusInfo = getOverallStatusInfo();
 
   return (
-    <>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header Banner */}
-        <div className={`rounded-lg p-6 shadow-lg mb-10 text-white ${getOverallStatusStyle()}`}>
-          <h2 className="text-3xl font-bold">{getOverallStatusText()}</h2>
-          <p className="mt-2 text-sm opacity-90">Last updated: {new Date().toLocaleTimeString()}</p>
+    <div className="min-h-screen bg-[var(--color-canvas)] text-[var(--color-text-primary)] font-sans selection:bg-[var(--color-brand-subtle)]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 flex flex-col gap-12">
+        
+        {/* Header / Brand */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-[var(--color-brand)] shadow-[var(--shadow-glow-brand)] flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <span className="text-title-lg font-bold">StatusPing</span>
+          </div>
+        </div>
+
+        {/* Overall Status Hero */}
+        <div 
+          className="rounded-[var(--radius-lg)] p-8 shadow-[var(--shadow-md)] border flex flex-col gap-2"
+          style={{ backgroundColor: statusInfo.bg, borderColor: statusInfo.color + '33' }}
+        >
+          <div className="flex items-center gap-4">
+            <span className="relative flex h-5 w-5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ backgroundColor: statusInfo.color }}></span>
+              <span className="relative inline-flex rounded-full h-5 w-5" style={{ backgroundColor: statusInfo.color, boxShadow: `0 0 12px ${statusInfo.color}` }}></span>
+            </span>
+            <h1 className="text-display font-semibold" style={{ color: statusInfo.color }}>
+              {statusInfo.text}
+            </h1>
+          </div>
+          <p className="text-body-md" style={{ color: statusInfo.color, opacity: 0.8 }}>
+            Last updated: {new Date().toLocaleTimeString()}
+          </p>
         </div>
 
         {/* Active Incidents */}
         {data.activeIncidents.length > 0 && (
-          <div className="mb-10">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Active Incidents</h3>
-            <div className="space-y-4">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-title-lg font-bold">Active Incidents</h2>
+            <div className="flex flex-col gap-4">
               {data.activeIncidents.map(incident => (
-                <div key={incident.id} className="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
-                  <h4 className="font-bold text-red-800">{incident.monitor.name}</h4>
-                  <p className="text-sm text-red-700 mt-1">
-                    Investigating - We are currently experiencing an issue ({incident.errorType || 'Unknown Error'}).
+                <div key={incident.id} className="bg-[var(--color-surface)] border-l-4 border-[var(--color-down)] p-6 rounded-[var(--radius-md)] shadow-[var(--shadow-sm)] flex flex-col gap-3">
+                  <h3 className="text-title-md font-bold text-[var(--color-text-primary)]">{incident.monitor.name} — Investigating</h3>
+                  <p className="text-body-md text-[var(--color-text-secondary)]">
+                    We are currently experiencing an issue ({incident.errorType || 'Unknown Error'}). Our team is investigating and working on a resolution.
                   </p>
-                  <p className="text-xs text-red-500 mt-2">
-                    Started: {new Date(incident.startedAt).toLocaleString()}
+                  <p className="text-caption text-[var(--color-text-tertiary)] mt-2">
+                    Started at {new Date(incident.startedAt).toLocaleString()}
                   </p>
                 </div>
               ))}
@@ -96,56 +113,57 @@ export default function PublicStatusPage() {
         )}
 
         {/* Monitors List */}
-        <div>
-          <h3 className="text-xl font-bold mb-4 text-gray-900">Uptime (Last 90 Days)</h3>
-          <div className="bg-white shadow rounded-lg overflow-hidden border border-gray-100">
-            <ul className="divide-y divide-gray-200">
-              {data.monitors.map(monitor => (
-                <li key={monitor.id} className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-semibold text-lg text-gray-900">{monitor.name}</h4>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
-                      ${monitor.status === 'down' ? 'bg-red-100 text-red-800' : 
-                        monitor.status === 'degraded' ? 'bg-yellow-100 text-yellow-800' : 
-                        monitor.status === 'paused' ? 'bg-gray-100 text-gray-800' :
-                        'bg-green-100 text-green-800'}`}
-                    >
-                      {monitor.status}
-                    </span>
+        <div className="flex flex-col gap-6">
+          <h2 className="text-title-lg font-bold">Uptime Overview</h2>
+          <div className="bg-[var(--color-surface)] shadow-[var(--shadow-sm)] rounded-[var(--radius-lg)] border border-[var(--color-border)] divide-y divide-[var(--color-border)]">
+            {data.monitors.map(monitor => {
+              
+              const isUp = monitor.status === 'active' || monitor.status === 'operational';
+              const isDegraded = monitor.status === 'degraded';
+              const statusColor = isUp ? 'var(--color-up)' : (isDegraded ? 'var(--color-degraded)' : 'var(--color-down)');
+              const statusText = isUp ? 'Operational' : (isDegraded ? 'Degraded' : 'Outage');
+              
+              // Calculate 90d average
+              const validDays = monitor.uptime90d.filter(d => d.uptimePercent !== null);
+              const avgUptime = validDays.length > 0 
+                ? (validDays.reduce((acc, curr) => acc + (curr.uptimePercent || 0), 0) / validDays.length).toFixed(2)
+                : '100.00';
+
+              return (
+                <div key={monitor.id} className="p-6 sm:p-8 flex flex-col gap-5">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-title-md font-semibold">{monitor.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-body-sm font-medium" style={{ color: statusColor }}>{statusText}</span>
+                    </div>
                   </div>
                   
-                  {/* Uptime bar */}
-                  <div className="mt-4 flex space-x-1 h-10 w-full overflow-hidden rounded">
-                    {monitor.uptime90d.map((day, idx) => {
-                      let color = 'bg-gray-200'; // No data
-                      if (day.uptimePercent !== null) {
-                        if (day.uptimePercent >= 99) color = 'bg-green-400';
-                        else if (day.uptimePercent >= 90) color = 'bg-yellow-400';
-                        else color = 'bg-red-400';
-                      }
-                      return (
-                        <div 
-                          key={idx} 
-                          title={`${day.date}: ${day.uptimePercent !== null ? day.uptimePercent + '%' : 'No data'}`}
-                          className={`flex-1 ${color} transition-opacity hover:opacity-75 cursor-help rounded-sm`}
-                        />
-                      );
-                    })}
+                  <div className="flex flex-col gap-2">
+                    <UptimeBars data={monitor.uptime90d} className="h-10" />
+                    <div className="flex justify-between items-center text-caption text-[var(--color-text-tertiary)] font-medium">
+                      <span>90 days ago</span>
+                      <span className="text-[var(--color-brand)] bg-[var(--color-brand-subtle)] px-2 py-0.5 rounded">{avgUptime}% Uptime</span>
+                      <span>Today</span>
+                    </div>
                   </div>
-                  <div className="mt-2 flex justify-between text-xs text-gray-500">
-                    <span>90 days ago</span>
-                    <span>100% uptime</span>
-                    <span>Today</span>
-                  </div>
-                </li>
-              ))}
-              {data.monitors.length === 0 && (
-                <li className="p-6 text-center text-gray-500">No public monitors available.</li>
-              )}
-            </ul>
+                </div>
+              );
+            })}
+            {data.monitors.length === 0 && (
+              <div className="p-12 text-center text-body-lg text-[var(--color-text-secondary)]">
+                No public monitors configured.
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-8 border-t border-[var(--color-border)] text-center">
+          <a href="/" className="text-caption text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors inline-flex items-center gap-1.5">
+            Powered by <strong className="font-semibold">StatusPing</strong>
+          </a>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
