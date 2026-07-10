@@ -17,6 +17,7 @@ import incidentsRoutes from './routes/incidents.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
 import statusRoutes from './routes/status.routes.js';
 import healthRoutes from './routes/health.routes.js';
+import aiInsightsRoutes from './routes/ai-insights.routes.js';
 
 // Create and configure Express application
 function createApp() {
@@ -77,6 +78,9 @@ app.use(
 
   // Protected incident routes (auth + user rate limit)
   app.use('/api/incidents', authMiddleware, rateLimiter, incidentsRoutes);
+
+  // Protected AI insights (auth + user rate limit)
+  app.use('/api/ai-insights', authMiddleware, rateLimiter, aiInsightsRoutes);
 
     // Error Handlers
   // 404 handler
