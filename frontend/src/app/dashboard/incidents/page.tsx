@@ -148,7 +148,14 @@ export default function IncidentsPage() {
         ) : (
           <div className="divide-y divide-[var(--color-border)]">
             {filtered.map((inc) => (
-              <div key={inc.id} className="p-5 flex flex-col gap-3 hover:bg-[var(--color-surface-raised)]/50 transition-colors">
+              <div
+                key={inc.id}
+                className={`p-5 pl-6 flex flex-col gap-3 border-l-4 hover:bg-[var(--color-surface-raised)]/50 transition-colors ${
+                  inc.status === 'open'
+                    ? 'border-[var(--color-down)] bg-[var(--color-down-subtle)]/30'
+                    : 'border-[var(--color-up)]'
+                }`}
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 min-w-0">
                     <StatusDot

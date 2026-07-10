@@ -105,8 +105,8 @@ export default function AiInsightsPage() {
                 <div className="flex items-center gap-1.5">
                   <div className="w-16 h-1.5 rounded-full bg-[var(--color-surface-raised)] overflow-hidden">
                     <div
-                      className="h-full rounded-full"
-                      style={{ width: `${ins.confidence}%`, backgroundColor: sev.color }}
+                      className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-600"
+                      style={{ width: `${ins.confidence}%` }}
                     />
                   </div>
                   <span className="text-caption text-[var(--color-text-tertiary)]">{ins.confidence}%</span>

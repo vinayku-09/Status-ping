@@ -2,8 +2,19 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import Link from 'next/link';
+
+const menuItems = [
+  { name: "Features", href: "#features" },
+  { name: "Monitoring Agents", href: "#infrastructure" },
+  { name: "How It Works", href: "#how-it-works" },
+  { name: "Integrations", href: "#integrations" },
+  { name: "Docs", href: "#docs" },
+];
 
 export function LandingNav() {
+  const { user, isLoading } = useAuth();
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
 
@@ -54,31 +65,53 @@ export function LandingNav() {
             </span>
           </div>
           
-          {/* Desktop Links */}
+          {/* Desktop Links - Mapped Dynamically */}
           <div className="hidden md:flex items-center gap-7">
-            <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
-            <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Pricing</a>
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Docs</a>
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Status</a>
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Blog</a>
+            {menuItems.map((item) => (
+              <a 
+                key={item.name} 
+                href={item.href} 
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                {item.name}
+              </a>
+            ))}
           </div>
 
           {/* Desktop CTA Action Cluster */}
           <div className="hidden md:flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium px-3.5"
-            >
-              Log in
-            </Button>
-            <Button 
-              variant="primary" 
-              size="sm" 
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-600/10 font-medium px-4 py-2 rounded-lg"
-            >
-              Get Started
-            </Button>
+            {!isLoading && user ? (
+              <Link href="/dashboard">
+                <Button 
+                  variant="primary" 
+                  size="sm" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm transition-all shadow-sm shadow-blue-600/10"
+                >
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium px-3.5"
+                  >
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button 
+                    variant="primary" 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-600/10 font-medium px-4 py-2 rounded-lg"
+                  >
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
           
           {/* Mobile responsive drawer toggle trigger button */}
@@ -105,60 +138,54 @@ export function LandingNav() {
         {/* Mobile Dropdown Menu Container */}
         {open && (
           <div className="mt-4 flex flex-col gap-5 border-t border-slate-100 pt-4 md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Mobile Links - Mapped Dynamically */}
             <div className="flex flex-col space-y-1.5">
-              <a
-                href="#features"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-              >
-                Features
-              </a>
-              <a
-                href="#pricing"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-              >
-                Pricing
-              </a>
-              <a
-                href="#"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-              >
-                Docs
-              </a>
-              <a
-                href="#"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-              >
-                Status
-              </a>
-              <a
-                href="#"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-              >
-                Blog
-              </a>
+              {menuItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  {item.name}
+                </a>
+              ))}
             </div>
 
             {/* Mobile Actions Footer Block */}
             <div className="border-t border-slate-100 pt-4 pb-2 flex flex-col gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="w-full justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium py-2.5 rounded-lg"
-              >
-                Log in
-              </Button>
-              <Button 
-                variant="primary" 
-                size="sm" 
-                className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm shadow-blue-600/10"
-              >
-                Get Started
-              </Button>
+              {!isLoading && user ? (
+                <Link href="/dashboard">
+                  <Button 
+                    variant="primary" 
+                    size="sm" 
+                    className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm transition-all shadow-sm shadow-blue-600/10"
+                  >
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium py-2.5 rounded-lg"
+                    >
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button 
+                      variant="primary" 
+                      size="sm" 
+                      className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm shadow-blue-600/10"
+                    >
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

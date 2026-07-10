@@ -12,6 +12,8 @@ import { UptimeBars, UptimeBarData } from '@/components/ui/UptimeBars';
 import { StatusDot } from '@/components/ui/StatusDot';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/Button';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { CheckCircle2, Pause } from 'lucide-react';
 
 export default function DashboardOverviewPage() {
   const [monitors, setMonitors] = useState<MonitorListItem[]>([]);
@@ -76,6 +78,13 @@ export default function DashboardOverviewPage() {
     });
   };
 
+  const generateMockLatency = (status: string) => {
+    return Array.from({ length: 20 }).map((_, i) => ({
+      time: i.toString(),
+      latency: status === 'down' ? 0 : 40 + Math.random() * 60
+    }));
+  };
+
   return (
     <div className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
       <div className="flex items-center justify-between">
@@ -100,20 +109,29 @@ export default function DashboardOverviewPage() {
           <h2 className="text-title-lg text-[var(--color-text-primary)]">Monitor Status</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {monitors.map(monitor => (
-              <Card key={monitor.id} className="p-5 flex flex-col gap-4" clickable={true}>
+              <Card key={monitor.id} className="p-5 flex flex-col gap-4 group transition-all duration-200 hover:border-[var(--color-brand)] hover:shadow-sm" clickable={true}>
                 <div className="flex items-start justify-between">
                   <div className="flex flex-col">
-                    <span className="text-title-md text-[var(--color-text-primary)] font-semibold">{monitor.name}</span>
+                    <span className="text-title-md text-[var(--color-text-primary)] font-semibold group-hover:text-[var(--color-brand)] transition-colors">{monitor.name}</span>
                     <span className="text-caption text-[var(--color-text-tertiary)]">{monitor.url}</span>
                   </div>
                   <StatusBadge status={monitor.status} />
                 </div>
-                <div className="mt-2">
-                  <UptimeBars data={generateMockUptime(monitor.status)} compact />
-                  <div className="flex justify-between text-caption text-[var(--color-text-tertiary)] mt-1">
-                    <span>90 days ago</span>
-                    <span>{monitor.uptimePercent30d ?? 100}% uptime</span>
-                    <span>Today</span>
+                <div className="flex flex-col gap-3 mt-2">
+                  <div className="h-8 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={generateMockLatency(monitor.status)}>
+                        <Line type="monotone" dataKey="latency" stroke="var(--color-brand)" strokeWidth={2} dot={false} isAnimationActive={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div>
+                    <UptimeBars data={generateMockUptime(monitor.status)} compact />
+                    <div className="flex justify-between text-caption text-[var(--color-text-tertiary)] mt-1">
+                      <span>90 days ago</span>
+                      <span>{monitor.uptimePercent30d ?? 100}% uptime</span>
+                      <span>Today</span>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -154,18 +172,38 @@ export default function DashboardOverviewPage() {
           <div className="flex flex-col gap-4">
             <h2 className="text-title-lg text-[var(--color-text-primary)]">Recent Activity</h2>
             <Card className="p-0 overflow-hidden">
-              <div className="divide-y divide-[var(--color-border)]">
-                <div className="p-4 flex flex-col gap-1">
-                  <span className="text-body-sm text-[var(--color-text-primary)]">Monitor <strong>Marketing Site</strong> resumed</span>
-                  <span className="text-caption text-[var(--color-text-tertiary)]">2 hours ago</span>
+              <div className="p-6 flex flex-col gap-6 relative">
+                {/* Timeline vertical line */}
+                <div className="absolute left-[39px] top-8 bottom-8 w-px bg-[var(--color-border)]"></div>
+                
+                <div className="flex items-start gap-4 relative z-10">
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-up-subtle)] border border-[var(--color-up-subtle)] flex items-center justify-center shrink-0 z-10">
+                    <CheckCircle2 className="w-4 h-4 text-[var(--color-up)]" />
+                  </div>
+                  <div className="flex flex-col gap-1 pt-1">
+                    <span className="text-body-sm text-[var(--color-text-primary)]">Monitor <strong className="font-semibold">Marketing Site</strong> resumed</span>
+                    <span className="text-caption text-[var(--color-text-tertiary)]">2 hours ago</span>
+                  </div>
                 </div>
-                <div className="p-4 flex flex-col gap-1">
-                  <span className="text-body-sm text-[var(--color-text-primary)]">Incident on <strong>Database</strong> resolved</span>
-                  <span className="text-caption text-[var(--color-text-tertiary)]">Yesterday, 14:20</span>
+
+                <div className="flex items-start gap-4 relative z-10">
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-up-subtle)] border border-[var(--color-up-subtle)] flex items-center justify-center shrink-0 z-10">
+                    <CheckCircle2 className="w-4 h-4 text-[var(--color-up)]" />
+                  </div>
+                  <div className="flex flex-col gap-1 pt-1">
+                    <span className="text-body-sm text-[var(--color-text-primary)]">Incident on <strong className="font-semibold">Database</strong> resolved</span>
+                    <span className="text-caption text-[var(--color-text-tertiary)]">Yesterday, 14:20</span>
+                  </div>
                 </div>
-                <div className="p-4 flex flex-col gap-1">
-                  <span className="text-body-sm text-[var(--color-text-primary)]">Monitor <strong>Database</strong> paused</span>
-                  <span className="text-caption text-[var(--color-text-tertiary)]">Yesterday, 10:00</span>
+
+                <div className="flex items-start gap-4 relative z-10">
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-paused-subtle)] border border-[var(--color-paused-subtle)] flex items-center justify-center shrink-0 z-10">
+                    <Pause className="w-4 h-4 text-[var(--color-paused)]" />
+                  </div>
+                  <div className="flex flex-col gap-1 pt-1">
+                    <span className="text-body-sm text-[var(--color-text-primary)]">Monitor <strong className="font-semibold">Database</strong> paused</span>
+                    <span className="text-caption text-[var(--color-text-tertiary)]">Yesterday, 10:00</span>
+                  </div>
                 </div>
               </div>
             </Card>

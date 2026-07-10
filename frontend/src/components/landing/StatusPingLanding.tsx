@@ -58,15 +58,8 @@ import {
 } from "framer-motion";
 import { FaGithub } from "react-icons/fa";
 import HowItWorksSection from "./HowItWorksSection";
+import { LandingNav } from "./LandingNav";
 const AURORA_COLORS = ["#bfdbfe", "#93c5fd", "#a5b4fc", "#7dd3fc", "#c4b5fd", "#dbeafe"];
-
-const menuItems = [
-  { name: "Features", href: "#features" },
-  { name: "Monitoring Agents", href: "#infrastructure" },
-  { name: "How It Works", href: "#how-it-works" },
-  { name: "Integrations", href: "#integrations" },
-  { name: "Docs", href: "#docs" },
-];
 
 export function StatusPingLanding() {
   const color = useMotionValue(AURORA_COLORS[0]);
@@ -85,7 +78,7 @@ export function StatusPingLanding() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-white text-slate-900">
-      <Header />
+      <LandingNav />
       <main className="relative">
         <motion.section style={{ backgroundImage }} className="relative overflow-hidden px-4 pb-24 pt-20 sm:pb-40 sm:pt-28">
           <StarField />
@@ -169,124 +162,6 @@ export function StatusPingLanding() {
         <Footer />
       </main>
     </div>
-  );
-}
-
-export default function Header() {
-  const [scrolled, setScrolled] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
-
-  // Smoothly catch scrolling events to swap out navbar form-factors
-  React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    /* Outer layout wrapper to handle the floating gap adjustment elegantly without layout shifting */
-    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-      scrolled ? "px-4 pt-3" : "px-0 pt-0"
-    }`}>
-      <nav
-        className={`mx-auto w-full transition-all duration-500 ease-in-out ${
-          scrolled
-            ? "max-w-5xl rounded-2xl border border-slate-200/80 bg-white/80 shadow-md shadow-slate-900/5 backdrop-blur-md px-5 py-3"
-            : "max-w-full border-b border-transparent bg-transparent px-6 py-5"
-        } ${
-          open 
-            ? "max-md:h-[auto] max-md:bg-white max-md:rounded-2xl max-md:border-slate-200 max-md:shadow-xl max-md:mx-0" 
-            : ""
-        }`}
-      >
-        <div className="flex items-center justify-between gap-6">
-          
-          {/* Brand Identity */}
-          <a href="#" className="flex items-center gap-2.5 flex-shrink-0 group">
-            <Activity className="h-5 w-5 text-blue-600 transition-transform group-active:scale-95" strokeWidth={2.5} />
-            <span className="font-semibold text-base tracking-tight text-slate-950">
-              StatusPing
-            </span>
-          </a>
-
-          {/* Desktop Navigation Link Lists */}
-          <ul className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
-            {menuItems.map((item) => (
-              <li key={item.name}>
-                <a 
-                  href={item.href} 
-                  className="transition-colors hover:text-slate-900"
-                >
-                  {item.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-
-          {/* Desktop Auth Actions Cluster */}
-          <div className="hidden items-center gap-4 md:flex">
-            <a 
-              href="/login" 
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              Log in
-            </a>
-            <a 
-              href="/register" 
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-blue-600/10 transition-colors hover:bg-blue-700"
-            >
-              Try for Free
-            </a>
-          </div>
-
-          {/* Mobile responsive drawer toggle trigger button */}
-          <button 
-            onClick={() => setOpen((v) => !v)} 
-            className="p-2 text-slate-700 rounded-lg hover:bg-slate-100/80 focus:outline-none transition-colors md:hidden" 
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-5 w-5 stroke-[2.5]" /> : <Menu className="h-5 w-5 stroke-[2.5]" />}
-          </button>
-        </div>
-
-        {/* Mobile View Navigation Drawer */}
-        {open && (
-          <div className="mt-4 flex flex-col gap-5 border-t border-slate-100 pt-4 md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="flex flex-col space-y-1.5">
-              {menuItems.map((item) => (
-                <a 
-                  key={item.name} 
-                  href={item.href} 
-                  className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={() => setOpen(false)}
-                >
-                  {item.name}
-                </a>
-              ))}
-            </div>
-
-            {/* Mobile Actions Footer Area */}
-            <div className="border-t border-slate-100 pt-4 pb-2 flex flex-col gap-2">
-              <a 
-                href="/login" 
-                className="w-full text-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium py-2.5 rounded-lg text-sm transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                Log in
-              </a>
-              <a 
-                href="/register" 
-                className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm shadow-blue-600/10 text-sm transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                Try for Free
-              </a>
-            </div>
-          </div>
-        )}
-      </nav>
-    </header>
   );
 }
 

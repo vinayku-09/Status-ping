@@ -1,6 +1,18 @@
 'use client';
 
 import { useEffect, useState, useMemo } from "react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { api } from '@/lib/apiClient';
 import { MonitorListItem, DailyStat, PingLog } from '@/lib/types';
 import { Card } from '@/components/ui/Card';
@@ -8,45 +20,31 @@ import { KPICard } from '@/components/ui/KPICard';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 
-function ResponseTimeChart({ data }: { data: DailyStat[] }) {
-  const max = Math.max(
-    1,
-    ...data.map((d) => Math.max(d.p50Ms || 0, d.p95Ms || 0, d.p99Ms || 0))
-  );
-  return (
-    <div className="flex items-end gap-[3px] h-48 w-full">
-      {data.map((d, i) => {
-        const p50 = d.p50Ms ?? 0;
-        const p95 = d.p95Ms ?? 0;
-        const p99 = d.p99Ms ?? 0;
-        return (
-          <div key={i} className="flex-1 flex flex-col justify-end gap-[2px] group relative" title={`${d.statDate}\np50: ${p50}ms\np95: ${p95}ms\np99: ${p99}ms`}>
-            <div className="w-full bg-[var(--color-chart-4)] rounded-t-sm" style={{ height: `${(p99 / max) * 100}%` }} />
-            <div className="w-full bg-[var(--color-chart-1)]" style={{ height: `${(p95 / max) * 100}%` }} />
-            <div className="w-full bg-[var(--color-up)]" style={{ height: `${(p50 / max) * 100}%` }} />
-          </div>
-        );
-      })}
-    </div>
-  );
+const tooltipStyle = {
+  background: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-md)',
+  color: 'var(--color-text-primary)',
+  fontSize: '12px',
+  boxShadow: 'var(--shadow-md)',
+};
+
+const axisStyle = {
+  fontSize: 11,
+  fill: 'var(--color-text-tertiary)',
+};
+
+function uptimeColor(pct: number | null): string {
+  if (pct === null) return 'var(--color-border)';
+  if (pct >= 99.9) return 'var(--color-up)';
+  if (pct >= 99) return '#63C87C';
+  if (pct >= 95) return 'var(--color-degraded)';
+  return 'var(--color-down)';
 }
 
-function UptimeChart({ data }: { data: DailyStat[] }) {
-  return (
-    <div className="flex items-end gap-[3px] h-48 w-full">
-      {data.map((d, i) => {
-        const pct = d.uptimePercent ?? 100;
-        const height = Math.max(2, ((pct - 90) / 10) * 100);
-        const color =
-          pct >= 99.9 ? 'var(--color-up)' : pct >= 99 ? '#63C87C' : pct >= 95 ? 'var(--color-degraded)' : 'var(--color-down)';
-        return (
-          <div key={i} className="flex-1 group relative" title={`${d.statDate}: ${pct}%`}>
-            <div className="w-full rounded-t-sm" style={{ height: `${height}%`, backgroundColor: color }} />
-          </div>
-        );
-      })}
-    </div>
-  );
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 export default function AnalyticsPage() {
@@ -178,7 +176,44 @@ export default function AnalyticsPage() {
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[var(--color-chart-4)]" />p99</span>
               </div>
             </div>
-            <ResponseTimeChart data={stats} />
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={stats} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="grad-p50" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-up)" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="var(--color-up)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="grad-p95" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-chart-1)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--color-chart-1)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="grad-p99" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-chart-4)" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="var(--color-chart-4)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <XAxis
+                    dataKey="statDate"
+                    tickFormatter={formatDate}
+                    tick={axisStyle}
+                    tickLine={false}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    minTickGap={24}
+                  />
+                  <YAxis tick={axisStyle} tickLine={false} axisLine={false} width={48} unit="ms" />
+                  <Tooltip
+                    contentStyle={tooltipStyle}
+                    labelStyle={{ color: 'var(--color-text-secondary)', marginBottom: 4 }}
+                    formatter={(value, name) => [`${value} ms`, String(name).toUpperCase()]}
+                  />
+                  <Area type="monotone" dataKey="p50Ms" name="p50" stroke="var(--color-up)" strokeWidth={2} fill="url(#grad-p50)" isAnimationActive={false} />
+                  <Area type="monotone" dataKey="p95Ms" name="p95" stroke="var(--color-chart-1)" strokeWidth={2} fill="url(#grad-p95)" isAnimationActive={false} />
+                  <Area type="monotone" dataKey="p99Ms" name="p99" stroke="var(--color-chart-4)" strokeWidth={2} fill="url(#grad-p99)" isAnimationActive={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
             <div className="flex justify-between text-caption text-[var(--color-text-tertiary)]">
               <span>{days} days ago</span>
               <span>Today</span>
@@ -187,7 +222,40 @@ export default function AnalyticsPage() {
 
           <Card className="p-6 flex flex-col gap-4">
             <h2 className="text-title-md text-[var(--color-text-primary)]">Daily Uptime %</h2>
-            <UptimeChart data={stats} />
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <XAxis
+                    dataKey="statDate"
+                    tickFormatter={formatDate}
+                    tick={axisStyle}
+                    tickLine={false}
+                    axisLine={{ stroke: 'var(--color-border)' }}
+                    minTickGap={24}
+                  />
+                  <YAxis
+                    domain={[90, 100]}
+                    tick={axisStyle}
+                    tickLine={false}
+                    axisLine={false}
+                    width={48}
+                    tickFormatter={(v) => `${v}%`}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'var(--color-surface-raised)' }}
+                    contentStyle={tooltipStyle}
+                    labelStyle={{ color: 'var(--color-text-secondary)', marginBottom: 4 }}
+                    formatter={(value) => [`${value}%`, 'Uptime']}
+                  />
+                  <Bar dataKey="uptimePercent" name="Uptime" radius={[3, 3, 0, 0]} isAnimationActive={false}>
+                    {stats.map((d, i) => (
+                      <Cell key={i} fill={uptimeColor(d.uptimePercent)} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
             <div className="flex justify-between text-caption text-[var(--color-text-tertiary)]">
               <span>{days} days ago</span>
               <span>Today</span>

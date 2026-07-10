@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/apiClient';
-import { MonitorDetail, PingLog } from '@/lib/types';
+import { MonitorDetail, PingLog, SslCheck } from '@/lib/types';
 import { StatusDot } from '@/components/ui/StatusDot';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -13,6 +13,91 @@ import { UptimeBars, UptimeBarData } from '@/components/ui/UptimeBars';
 import { Card } from '@/components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
+
+function SslTracker({ ssl }: { ssl: SslCheck | null }) {
+  if (!ssl) {
+    return (
+      <Card className="p-8 text-center text-[var(--color-text-secondary)]">
+        No SSL check recorded for this monitor yet.
+      </Card>
+    );
+  }
+
+  const days = ssl.daysRemaining ?? 0;
+  const tone =
+    days > 30
+      ? { color: 'var(--color-up)', bg: 'var(--color-up-subtle)', text: 'var(--color-up-text)', label: 'Healthy' }
+      : days > 14
+      ? { color: 'var(--color-degraded)', bg: 'var(--color-degraded-subtle)', text: 'var(--color-degraded-text)', label: 'Expiring Soon' }
+      : { color: 'var(--color-down)', bg: 'var(--color-down-subtle)', text: 'var(--color-down-text)', label: 'Critical' };
+
+  const pct = Math.max(0, Math.min(100, (days / 90) * 100));
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <Card className="p-6 flex flex-col items-center justify-center gap-3 lg:col-span-1">
+        <div className="relative h-36 w-36">
+          <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--color-surface-raised)" strokeWidth="3.5" />
+            <circle
+              cx="18"
+              cy="18"
+              r="15.5"
+              fill="none"
+              stroke={tone.color}
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeDasharray={`${pct} 100`}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-title-xl font-semibold text-[var(--color-text-primary)] tabular-nums">{days}</span>
+            <span className="text-caption text-[var(--color-text-tertiary)]">days left</span>
+          </div>
+        </div>
+        <span
+          className="text-caption font-semibold px-2.5 py-0.5 rounded-full"
+          style={{ color: tone.text, backgroundColor: tone.bg }}
+        >
+          {tone.label}
+        </span>
+      </Card>
+
+      <Card className="p-6 flex flex-col gap-4 lg:col-span-2">
+        <h2 className="text-title-md text-[var(--color-text-primary)]">SSL Certificate</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-caption text-[var(--color-text-tertiary)]">Issuer</span>
+            <span className="text-body-sm font-medium text-[var(--color-text-primary)]">{ssl.issuer || 'Unknown'}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-caption text-[var(--color-text-tertiary)]">Status</span>
+            <span className="text-body-sm font-medium" style={{ color: ssl.isValid ? 'var(--color-up-text)' : 'var(--color-down-text)' }}>
+              {ssl.isValid ? 'Valid' : 'Invalid'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-caption text-[var(--color-text-tertiary)]">Expires</span>
+            <span className="text-body-sm font-medium text-[var(--color-text-primary)] tabular-nums">
+              {ssl.expiresAt ? new Date(ssl.expiresAt).toLocaleDateString() : '—'}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-caption text-[var(--color-text-tertiary)]">Last Checked</span>
+            <span className="text-body-sm font-medium text-[var(--color-text-primary)] tabular-nums">
+              {new Date(ssl.checkedAt).toLocaleString()}
+            </span>
+          </div>
+        </div>
+        {ssl.errorMessage && (
+          <p className="text-body-sm text-[var(--color-down-text)] bg-[var(--color-down-subtle)] border border-[var(--color-down)]/20 rounded-[var(--radius-md)] px-3 py-2">
+            {ssl.errorMessage}
+          </p>
+        )}
+      </Card>
+    </div>
+  );
+}
 
 export default function MonitorDetailPage() {
   const router = useRouter();
@@ -202,42 +287,56 @@ export default function MonitorDetailPage() {
       {activeTab === 'ping-logs' && (
         <div className="flex flex-col gap-4">
           <h2 className="text-title-md text-[var(--color-text-primary)]">Recent Pings</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Time</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Response Time</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead>Error</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pingLogs.map(log => (
-                <TableRow key={log.id}>
-                  <TableCell>{new Date(log.checkedAt).toLocaleString()}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${log.isUp ? 'bg-[var(--color-up-subtle)] text-[var(--color-up-text)]' : 'bg-[var(--color-down-subtle)] text-[var(--color-down-text)]'}`}>
-                      {log.isUp ? 'OK' : 'FAIL'}
-                    </span>
-                  </TableCell>
-                  <TableCell>{log.responseTimeMs ? `${log.responseTimeMs}ms` : '-'}</TableCell>
-                  <TableCell>{log.statusCode || '-'}</TableCell>
-                  <TableCell>{log.errorType || '-'}</TableCell>
-                </TableRow>
-              ))}
-              {pingLogs.length === 0 && (
+          <Card className="p-0 overflow-hidden">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-[var(--color-text-secondary)]">No ping logs available.</TableCell>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Response Time</TableHead>
+                  <TableHead>Code</TableHead>
+                  <TableHead>Error</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {pingLogs.map((log, idx) => (
+                  <TableRow
+                    key={log.id}
+                    className={idx % 2 === 1 ? 'bg-[var(--color-surface-raised)]/40' : ''}
+                  >
+                    <TableCell className="text-[var(--color-text-secondary)] tabular-nums">
+                      {new Date(log.checkedAt).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${log.isUp ? 'bg-[var(--color-up-subtle)] text-[var(--color-up-text)]' : 'bg-[var(--color-down-subtle)] text-[var(--color-down-text)]'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${log.isUp ? 'bg-[var(--color-up)]' : 'bg-[var(--color-down)]'}`} />
+                        {log.isUp ? 'OK' : 'FAIL'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-[var(--color-text-primary)] tabular-nums font-medium">
+                      {log.responseTimeMs ? `${log.responseTimeMs}ms` : '—'}
+                    </TableCell>
+                    <TableCell className="text-[var(--color-text-secondary)] tabular-nums">{log.statusCode || '—'}</TableCell>
+                    <TableCell className="text-[var(--color-text-secondary)]">{log.errorType || '—'}</TableCell>
+                  </TableRow>
+                ))}
+                {pingLogs.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-[var(--color-text-secondary)]">No ping logs available.</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
 
+      {activeTab === 'ssl' && (
+        <SslTracker ssl={monitorDetail.latestSslCheck} />
+      )}
+
       {/* Other tabs intentionally left blank for this scope */}
-      {['incidents', 'alerts', 'ssl', 'settings'].includes(activeTab) && (
+      {['incidents', 'alerts', 'settings'].includes(activeTab) && (
         <div className="py-12 text-center text-[var(--color-text-secondary)]">
           This tab is under construction.
         </div>
