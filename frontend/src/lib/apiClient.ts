@@ -19,14 +19,18 @@ import {
   CreateNotificationBody,
   StatusPageData,
   HealthResponse,
+  AiInsight,
   ApiResponse,
 } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 class ApiClientError extends Error {
-  constructor(public status: number, public data: any) {
-    super(data?.error?.message || 'An API error occurred');
+  constructor(public status: number, public data: unknown) {
+    const message =
+      (data as { error?: { message?: string } } | null)?.error?.message ||
+      'An API error occurred';
+    super(message);
     this.name = 'ApiClientError';
   }
 }
@@ -55,7 +59,7 @@ export class ApiClient {
     });
 
     if (response.status === 204) {
-      return null as any;
+      return null as unknown as T;
     }
 
     const data = await response.json();
@@ -67,10 +71,10 @@ export class ApiClient {
     return data;
   }
 
-  private buildQueryString(params?: Record<string, any>): string {
+  private buildQueryString(params?: object): string {
     if (!params) return '';
     const searchParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) {
+    for (const [key, value] of Object.entries(params) as [string, unknown][]) {
       if (value !== undefined && value !== null) {
         searchParams.append(key, String(value));
       }
@@ -93,7 +97,7 @@ export class ApiClient {
   }
 
   // Monitors
-  async getMonitors(params?: ListMonitorsParams): Promise<ApiResponse<MonitorListItem[]> & { meta: any }> {
+  async getMonitors(params?: ListMonitorsParams): Promise<ApiResponse<MonitorListItem[]>> {
     return this.fetch(`/api/monitors${this.buildQueryString(params)}`);
   }
 
@@ -114,16 +118,16 @@ export class ApiClient {
   }
 
   // Ping Logs
-  async getPingLogs(monitorId: string, params?: ListPingLogsParams): Promise<ApiResponse<PingLog[]> & { meta: any }> {
+  async getPingLogs(monitorId: string, params?: ListPingLogsParams): Promise<ApiResponse<PingLog[]>> {
     return this.fetch(`/api/monitors/${monitorId}/ping-logs${this.buildQueryString(params)}`);
   }
 
-  async getResponseTimes(monitorId: string, params?: ResponseTimesParams): Promise<ApiResponse<DailyStat[]> & { meta: any }> {
+  async getResponseTimes(monitorId: string, params?: ResponseTimesParams): Promise<ApiResponse<DailyStat[]>> {
     return this.fetch(`/api/monitors/${monitorId}/response-times${this.buildQueryString(params)}`);
   }
 
   // Incidents
-  async getIncidents(monitorId: string, params?: ListIncidentsParams): Promise<ApiResponse<Incident[]> & { meta: any }> {
+  async getIncidents(monitorId: string, params?: ListIncidentsParams): Promise<ApiResponse<Incident[]>> {
     return this.fetch(`/api/monitors/${monitorId}/incidents${this.buildQueryString(params)}`);
   }
 
@@ -136,7 +140,7 @@ export class ApiClient {
     return this.fetch(`/api/monitors/${monitorId}/notifications`);
   }
 
-  async createNotification(monitorId: string, body: CreateNotificationBody): Promise<ApiResponse<NotificationConfig> & { meta?: any }> {
+  async createNotification(monitorId: string, body: CreateNotificationBody): Promise<ApiResponse<NotificationConfig>> {
     return this.fetch(`/api/monitors/${monitorId}/notifications`, { method: 'POST', body: JSON.stringify(body) });
   }
 
@@ -145,7 +149,7 @@ export class ApiClient {
   }
 
   // Public
-  async getStatusPage(): Promise<ApiResponse<StatusPageData> & { meta: any }> {
+  async getStatusPage(): Promise<ApiResponse<StatusPageData>> {
     return this.fetch('/api/status');
   }
 
@@ -154,10 +158,15 @@ export class ApiClient {
       return await this.fetch('/api/health');
     } catch (error) {
       if (error instanceof ApiClientError && error.data) {
-        return error.data; // The health endpoint returns JSON even on 503
+        return error.data as HealthResponse; // The health endpoint returns JSON even on 503
       }
       throw error;
     }
+  }
+
+  // AI Insights (dummy)
+  async getAiInsights(): Promise<ApiResponse<AiInsight[]>> {
+    return this.fetch('/api/ai-insights');
   }
 }
 

@@ -293,6 +293,24 @@ export interface StatusPageData {
 // Health
 // ========================
 
+// ========================
+// AI Insights (dummy)
+// ========================
+
+export type AiInsightSeverity = 'info' | 'warning' | 'critical';
+export type AiInsightCategory = 'performance' | 'reliability' | 'security' | 'optimization';
+
+export interface AiInsight {
+  id: string;
+  title: string;
+  description: string;
+  severity: AiInsightSeverity;
+  category: AiInsightCategory;
+  monitorName: string | null;
+  suggestedAction: string;
+  confidence: number;
+}
+
 export interface HealthResponse {
   status: 'ok' | 'degraded' | 'error';
   postgres: string;
