@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StatusPing | Monitor everything your stack effortlessly</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'sans-serif'],
+          },
+          colors: {
+            primary: '#2563eb',
+            surface: '#faf8ff',
+            'surface-dim': '#d2d9f4',
+            'surface-bright': '#faf8ff',
+            'navy': '#0f172a',
+          },
+          borderRadius: {
+            'custom': '8px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+    .hero-gradient {
+      background: radial-gradient(circle at center, #f2f3ff 0%, #ffffff 100%);
+    }
+    .card-shadow {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+<!-- BEGIN: Navigation -->
+<nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-custom flex items-center justify-center">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-xl font-bold tracking-tight text-navy">StatusPing</span>
+</div>
+<div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-600">
+<a class="hover:text-primary transition-colors" href="#">Platform</a>
+<a class="hover:text-primary transition-colors" href="#">How it works</a>
+<a class="hover:text-primary transition-colors" href="#">Integrations</a>
+<a class="hover:text-primary transition-colors" href="#">Blog</a>
+<a class="hover:text-primary transition-colors" href="#">Pricing</a>
+<a class="px-4 py-2 text-navy hover:text-primary" href="#">Log in</a>
+<a class="px-5 py-2.5 bg-primary text-white rounded-custom hover:bg-blue-700 transition-all" href="#">Start Free</a>
+</div>
+</div>
+</div>
+</nav>
+<!-- END: Navigation -->
+<!-- BEGIN: Hero Section -->
+<section class="hero-gradient pt-20 pb-32 overflow-hidden">
+<div class="max-w-7xl mx-auto px-4 text-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-primary text-xs font-semibold mb-8 animate-fade-in">
+<span>We just raised $10M to build the future of uptime monitoring</span>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
+</div>
+<h1 class="text-5xl md:text-7xl font-bold tracking-tight text-navy mb-6">
+        Monitor everything your <br/>stack effortlessly.
+      </h1>
+<p class="max-w-2xl mx-auto text-lg text-gray-600 mb-10 leading-relaxed">
+        Zero downtime for your SaaS. High-reliability monitoring with 30-second heartbeats and global edge nodes.
+      </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+<a class="px-8 py-4 bg-primary text-white font-semibold rounded-custom text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200" href="#">Try StatusPing for Free</a>
+</div>
+<!-- Browser Preview Mockup -->
+<div class="relative max-w-5xl mx-auto mt-12 rounded-xl border border-gray-200 bg-white shadow-2xl overflow-hidden p-2">
+<div class="bg-gray-50 border border-gray-100 rounded-lg p-4">
+<img alt="Dashboard Preview" class="w-full h-auto rounded-md shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAydLbdU5T5M4sfpS-WvdvZ_p-Y1Xrapt_jdg00tCBht6iZ9eYXOMZ3FrqdW8ple2wQByqpFTYLr1HD82h_abXC_U3gOtJS1MgeQFXn2drJELjrRcdpnXX5WqjvIJN3_LPVBRPDXmvPaTnRyFWaCjcjDq24TLBmO991lo9RfLXSUOaJT728C1mHLGmGaPv9I3NttcCELmqpe7F9Bh-PAXWDiCjeVCkZCXzedQciLt9pgUDdUy1INhnBq_A6_ONHAZVhg2RxuFgEmdY"/>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Hero Section -->
+<!-- BEGIN: Trusted By -->
+<section class="py-16 border-y border-gray-100 bg-white">
+<div class="max-w-7xl mx-auto px-4">
+<p class="text-center text-sm font-medium text-gray-400 mb-10 tracking-widest uppercase">Trusted by the best technology teams</p>
+<div class="flex flex-wrap justify-center items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+<span class="text-2xl font-bold">WORLDWIDE</span>
+<span class="text-2xl font-bold italic">AMD</span>
+<span class="text-2xl font-bold">ORACLE</span>
+<span class="text-2xl font-bold tracking-tighter">ALBUM</span>
+<span class="text-2xl font-bold">ATTOM</span>
+<span class="text-2xl font-bold">NVIDIA</span>
+<span class="text-2xl font-bold">STRAVITO</span>
+</div>
+</div>
+</section>
+<!-- END: Trusted By -->
+<!-- BEGIN: Value Proposition -->
+<section class="py-24 bg-white">
+<div class="max-w-7xl mx-auto px-4 text-center">
+<p class="text-primary font-semibold text-sm mb-4">Spray and pray to deal</p>
+<h2 class="text-4xl font-bold text-navy mb-16">No Signal? No Uptime.</h2>
+<div class="grid md:grid-cols-3 gap-12">
+<div class="space-y-4">
+<div class="mx-auto w-16 h-16 bg-blue-50 text-primary flex items-center justify-center rounded-2xl">
+<svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+</div>
+<p class="text-sm text-gray-600 px-8">Dumb automation killed the predictable uptime model</p>
+</div>
+<div class="space-y-4 border-x border-gray-100">
+<div class="mx-auto w-16 h-16 bg-blue-50 text-primary flex items-center justify-center rounded-2xl">
+<svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+</div>
+<p class="text-sm text-gray-600 px-8">Users have more sophisticated expectations than ever before</p>
+</div>
+<div class="space-y-4">
+<div class="mx-auto w-16 h-16 bg-blue-50 text-primary flex items-center justify-center rounded-2xl">
+<svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+</div>
+<p class="text-sm text-gray-600 px-8">Reliability orgs without full-cycle monitoring struggle to keep up</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Value Proposition -->
+<!-- BEGIN: Assistant Section -->
+<section class="py-24 bg-navy text-white">
+<div class="max-w-7xl mx-auto px-4">
+<div class="text-center mb-16">
+<p class="text-blue-400 font-semibold text-sm mb-4">Add value to every interaction</p>
+<h2 class="text-4xl font-bold mb-12">Your Proactive Reliability Assistant</h2>
+<div class="flex flex-wrap justify-center gap-8 text-sm font-medium border-b border-white/10 pb-4">
+<span class="text-blue-400 border-b-2 border-blue-400 pb-4 -mb-[18px]">Instant Alerts</span>
+<span class="opacity-60 hover:opacity-100 transition-opacity cursor-pointer">Endpoint Research</span>
+<span class="opacity-60 hover:opacity-100 transition-opacity cursor-pointer">Targeted Checks</span>
+<span class="opacity-60 hover:opacity-100 transition-opacity cursor-pointer">Deep Customization</span>
+</div>
+</div>
+<!-- Feature Highlight Card -->
+<div class="bg-white text-navy rounded-xl p-8 max-w-5xl mx-auto mb-20 shadow-2xl overflow-hidden">
+<div class="border-b border-gray-100 pb-6 mb-6">
+<h3 class="font-bold text-lg">System-wide Latency Check</h3>
+<p class="text-xs text-gray-500 mt-1">Global Edges • 30s intervals • Latency Profiling</p>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 items-start">
+<div class="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+<p class="text-sm font-medium">Global Node: Frankfurt - Response 45ms</p>
+</div>
+<div class="flex gap-4 items-start">
+<div class="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+<p class="text-sm font-medium">Global Node: San Francisco - Response 120ms</p>
+</div>
+<div class="flex gap-4 items-start">
+<div class="w-2 h-2 rounded-full bg-yellow-500 mt-2"></div>
+<p class="text-sm font-medium">Global Node: Tokyo - Response 320ms (Spike Detected)</p>
+</div>
+</div>
+<div class="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
+<p class="text-xs font-bold text-gray-400 mb-2">AUTO-DIAGNOSTIC LOG</p>
+<p class="text-sm italic text-gray-600">"Analyzing Tokyo spike. Tracing upstream to Cloudflare APAC gateway. Latency isolated to carrier level. Notifying DevOps team via Slack..."</p>
+</div>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+<div class="text-center p-8 border border-white/10 rounded-xl bg-white/5">
+<div class="text-5xl font-bold mb-2">100%</div>
+<div class="text-xs text-blue-400 font-bold mb-2">Global Uptime</div>
+<p class="text-xs opacity-60">Verified across 40+ regions</p>
+</div>
+<div class="text-center p-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-xl relative overflow-hidden">
+<div class="relative z-10">
+<div class="text-5xl font-bold mb-2">30s</div>
+<div class="text-xs text-white/80 font-bold mb-2">Alert Latency</div>
+<p class="text-xs text-white/70">Fastest reaction in the market</p>
+</div>
+<div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_70%)]"></div>
+</div>
+<div class="text-center p-8 border border-white/10 rounded-xl bg-white/5">
+<div class="text-5xl font-bold mb-2">40+</div>
+<div class="text-xs text-blue-400 font-bold mb-2">Integrations</div>
+<p class="text-xs opacity-60">Native Slack, PagerDuty, Discord</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Assistant Section -->
+<!-- BEGIN: Feature Cards Grid -->
+<section class="py-24 bg-surface">
+<div class="max-w-7xl mx-auto px-4">
+<div class="text-center mb-16">
+<p class="text-primary font-semibold text-sm mb-4">Benefits</p>
+<h2 class="text-4xl font-bold text-navy">Be Prepared for Every Incident</h2>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<!-- Feature 1 -->
+<div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="h-64 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-8">
+<div class="bg-white p-6 rounded-lg shadow-lg max-w-xs text-center border border-gray-100">
+<div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+</div>
+<p class="font-bold text-navy text-sm">Critical Error Detected</p>
+</div>
+</div>
+<div class="p-8">
+<h3 class="font-bold text-xl mb-3 text-navy">Curated Account Research</h3>
+<p class="text-gray-600 text-sm leading-relaxed">Identify bottlenecks within your infrastructure and speak your team's language across every touchpoint. Always find the root cause you need with waterfall enrichment.</p>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="h-64 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-12">
+<div class="bg-white p-4 rounded shadow-sm border border-gray-100 w-full max-w-xs">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<div class="h-2 w-24 bg-gray-100 rounded"></div>
+</div>
+<div class="space-y-2">
+<div class="h-2 w-full bg-gray-50 rounded"></div>
+<div class="h-2 w-3/4 bg-gray-50 rounded"></div>
+</div>
+</div>
+</div>
+<div class="p-8">
+<h3 class="font-bold text-xl mb-3 text-navy">Customized For Your GTM</h3>
+<p class="text-gray-600 text-sm leading-relaxed">Build reports that are as unique as your stack. StatusPing's super flexible agents give teams the information they need, exactly when they need it.</p>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="h-64 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-8">
+<div class="w-full max-w-xs bg-white rounded shadow-sm border border-gray-100 p-4">
+<div class="flex gap-2 items-center text-xs text-gray-400 mb-2">
+<span>Generating alert...</span>
+</div>
+<div class="h-10 bg-gray-50 rounded flex items-center px-4 justify-between">
+<div class="w-1 h-4 bg-gray-300 animate-pulse"></div>
+<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewbox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+</div>
+</div>
+</div>
+<div class="p-8">
+<h3 class="font-bold text-xl mb-3 text-navy">Targeted Engagement</h3>
+<p class="text-gray-600 text-sm leading-relaxed">Create targeted alert sequences for every incident in minutes. Write Slack updates and status page messages so good your customers won't know you're using automation.</p>
+</div>
+</div>
+<!-- Feature 4 -->
+<div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="h-64 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-8">
+<img alt="Collaboration Feature" class="rounded-lg shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3LnaJixKtfHjhP8-b-BM1JyZ8dTm0RV0InsV-e-uTu9No22vPBO8l0Ba2n1OtT1tb6FNdY2JUbh6tc31qbzsQNyXnREWe43LAtT1t8RSIrOP0hbjgpUETJ_KrgZVzlFhIDMcSnbaKBTtN62akmEJscmE3smZ5MOcHEpeD0inzpVNzcYdbAblTHP9fRP3QTApBS-u-IL2gv1kKyF9CiP-kp2HJV0-QQ9oWqwfA4B9kUMz_XdsFuT6z32RclRwaEPe7FFIWdrG9cRE"/>
+</div>
+<div class="p-8">
+<h3 class="font-bold text-xl mb-3 text-navy">Full Team Alignment</h3>
+<p class="text-gray-600 text-sm leading-relaxed">Align sales, marketing, and customer success teams around comprehensive downtime management. Scale your efforts without sacrificing quality or consistency.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Feature Cards Grid -->
+<!-- BEGIN: How It Works -->
+<section class="py-24 bg-white">
+<div class="max-w-7xl mx-auto px-4">
+<div class="text-center mb-16">
+<p class="text-primary font-semibold text-sm mb-4">How it works</p>
+<h2 class="text-4xl font-bold text-navy">Reliability in 3 Steps</h2>
+</div>
+<div class="grid md:grid-cols-3 gap-8 relative">
+<!-- Step 1 -->
+<div class="relative">
+<div class="p-8 bg-gray-50 rounded-xl border border-gray-100 h-full flex flex-col items-center text-center">
+<div class="mb-8 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+<svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+</div>
+<h3 class="font-bold text-lg mb-2">1. Connect</h3>
+<p class="text-sm text-gray-500 leading-relaxed">Connect your API endpoints, servers, or SaaS URLs in seconds.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative">
+<div class="p-8 bg-gray-50 rounded-xl border border-gray-100 h-full flex flex-col items-center text-center">
+<div class="mb-8 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+<svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+</div>
+<h3 class="font-bold text-lg mb-2">2. Monitor</h3>
+<p class="text-sm text-gray-500 leading-relaxed">We check every 30-60s from global edge locations to ensure accuracy.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative">
+<div class="p-8 bg-gray-50 rounded-xl border border-gray-100 h-full flex flex-col items-center text-center">
+<div class="mb-8 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+<svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+</div>
+<h3 class="font-bold text-lg mb-2">3. Alert</h3>
+<p class="text-sm text-gray-500 leading-relaxed">Instantly notify your team through Slack, PagerDuty, or SMS if any issues arise.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: How It Works -->
+<!-- BEGIN: Integrations -->
+<section class="py-24 bg-gray-50">
+<div class="max-w-7xl mx-auto px-4 text-center">
+<h2 class="text-3xl font-bold text-navy mb-16">Sync StatusPing with Your Tools</h2>
+<div class="relative max-w-2xl mx-auto">
+<div class="grid grid-cols-4 gap-8 items-center justify-center opacity-70">
+<div class="p-6 bg-white rounded-xl shadow-sm flex items-center justify-center"><img alt="Slack" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtTnkn9RY7c3cNNZmvOiQU8QbwbPQz1b_gTwmAiBvF4S_ttUoJOuh8rOJpV7AAKUSB42d0kpZSKEV3ws6hceP8h4kJPfwIgSVqkTjNNFbHw_mvcxibGRcxioPfJ9pjPkcCpRh5WqqPPKAGCTiNyPAm45Ri_bG3BB43fdj6B1c6ZUjQQOer43sE6VHliO54r9VjxVba63dyuirVBu8eQbgNqtocgWEgVOEKwdmHBWSJYvtUlWFZQVC8YgcQca8N69jTLjKPc1YX7QQ"/></div>
+<div class="p-6 bg-white rounded-xl shadow-sm flex items-center justify-center"><img alt="PagerDuty" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdwdGChhmHga0pQMvO8hRKkFpNBzfCPDTUlO3BXcf1omRuTGzTE2VhDp_xvvGHnGqTlu4rJGGthdYF8Pb3yKRD14iBTLjHMCwv1Drz-pxgYUm1yLKWhCFdg0FgcYtNc2hQwBesULKVutlCVEqUeICyrd1ivfRkmF_h_qDMNzc0a94vzaL_Qvo1iTgx6HbEy9VuN56BEVViT-ZYw_9eu_6bsYbeh724KekG1v16Y5U0jcAdBzBmYRxaeIewlH5CAn5nZ3auk21rjtQ"/></div>
+<div class="p-6 bg-white rounded-xl shadow-sm flex items-center justify-center"><img alt="Google Cloud" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAllbq9g07WtNh0muYTOmTr2fqzblMj1UNxala_Mu85OxDeGMb9AGy2Nzv4mhtCS2fgW0tM-S43Mvt1GpsYM584mHfZRK3KYzH2rUC6eHgF9K-Uv5mxeVZW6OyPgnMJPd6-2dAkVve_6WzbcUujDksDWFHdJfGw-vb-AeyHgl6FzUn_NXouY7R1-wkRFvrGXn20C7_Mz7vcMF4W4P5e19ptRU120a2SnoAayqtx5fHWMBG8JD8tnRGqW8iisoKBjXWcAZBprb8p-lA"/></div>
+<div class="p-6 bg-white rounded-xl shadow-sm flex items-center justify-center"><img alt="AWS" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMUZ_sqZG9T5Ue2g7JL4Ruih7i1EcRALUsPoEr-sa7gdQFCax_bvBEC9P0qn_QgOyGo-RWGzpvpsisVHq0c_f31Plgqzxj09jJjmYWBtAdPIWMh7aL7Q2Y3Yuip3LMl_ikL_nxLs1kFgG-A5I8oVjb7gM7OTgwPocchwmVXTlsy6O-50qZIOK2Mug2cPt9qdxW-4bASky53VoHLkQ3jiWCm_oNdVYpWwNznGasssZ8I-X0Ipg5QA58DjWAKWdl1-I-QFH3EQYiYNA"/></div>
+<div class="p-6 bg-white rounded-xl shadow-sm flex items-center justify-center col-start-2"><img alt="Teams" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWysbYPQaxn9Jq8HL8f6CQYuoxJpaC7lNujEKWWsNy-I_V_9nXkqHH4MoUZe_arP33tlIi9krurc5w7_He-MpguDd6PycfHKz9QxQGJo5Zgi2Vocz4AptMYwRiQ7tbLLn6HvWZ7ExDs3wZ27W22uR9JLzdWQdNlaMUc-2GLoRTx6DjqBLn0YApNJCGA6esIpulPd4EeSx1yXxdYelE3ImfCjz09nVlaaURL-FpFmnWQC1mUwgp5m2poGtmRKRSeI5FHHzqobstKeo"/></div>
+<div class="p-6 bg-white rounded-xl shadow-sm flex items-center justify-center"><img alt="Discord" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoBEJlCREKmMcHyYBtlqCqpa9whoHbva72ySGXLT-I-DStySL9xqKNWOc8zgtJqtAdp526EbH_QlrNZa82szWxd43GdxcDnLFSty2CLUCikJCTIjWOqpYD9UJpVlPQuWyGrRuQbY8mkROnbUkbFwr2LbsBr16b6_63xVPkbqwODITEoA1c5A5h5IOSNwQdORcKtHmnRYkAVLlSTnGgoymJckbdndpVjFdi9FKxirxsQU3Eg_9Nw5PQWYa3h1-AJkfT23wBhpb4hMM"/></div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Integrations -->
+<!-- BEGIN: Testimonials -->
+<section class="py-24 bg-white">
+<div class="max-w-7xl mx-auto px-4">
+<div class="text-center mb-16">
+<p class="text-primary font-semibold text-sm mb-4">Testimonials</p>
+<h2 class="text-4xl font-bold text-navy">Don't Take Our Word for It. Hear <br/>What Our Community Has to Say</h2>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Testimonial 1 -->
+<div class="p-8 bg-surface rounded-xl border border-gray-100 relative">
+<span class="absolute top-4 left-4 text-6xl text-blue-200 opacity-30 font-serif">"</span>
+<p class="text-sm text-gray-600 mb-8 leading-relaxed relative z-10">
+            StatusPing helps us centralize the critical infrastructure knowledge and data our engineering team needs into a single, easily accessible platform.
+          </p>
+<div class="flex items-center gap-4">
+<img alt="User" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKhvP-nsamqtFW19HMEUyL8rrZnrZHQnTtZhiC-cd9oOXkg4mvxZeJdXKyJt8UHVQVNP95cnYU2NcdFSuZDDNZ5I2e9axgV2BQuXAxIj4DfHZ67ZOFWV9Ez30lT7DZBhkGh7Mg8hbhYDqIXvuF119izNUL5Rk7pixz1yEvZQ0QmR5rmtkLSM5ja83JvhBWn5JlWUIDCCbeagjio9n1vtaLgphl56t-kI9clmb-Cy2VCyvz8XM6DyAb7A7n5thRipfEBW3eq0UZDXA"/>
+<div>
+<p class="text-sm font-bold text-navy">Thibaut Rous</p>
+<p class="text-xs text-gray-400">DevOps Manager @ VENT.AI</p>
+</div>
+</div>
+</div>
+<!-- Testimonial 2 -->
+<div class="p-8 bg-surface rounded-xl border border-gray-100 relative">
+<span class="absolute top-4 left-4 text-6xl text-blue-200 opacity-30 font-serif">"</span>
+<p class="text-sm text-gray-600 mb-8 leading-relaxed relative z-10">
+            The amazing thing about StatusPing is how it delivers accurate root-cause analysis and reduces my cognitive load during high-stress incidents.
+          </p>
+<div class="flex items-center gap-4">
+<img alt="User" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL5TwHrjea7997PSbbWtu_5LLrR3XjvUqOiCkbSGqRd6BBMlRAwK8vAmIu7240HUJegpxeLIISn2mxFeny7xi2GY9zmG2WzvUe32_mG9JObpc2_8xpz6JWDHlRoXCFFbJBV9mNSaWyt1myEzzuk50FNFEoNh8m8zFIapm09HA-aGg4ijncDtfSZU7iNExzh8sbpfEsTp_eTjOqwUytdjmCgMlmiMbONCgen-w_ACq-0iQDkS3k0Cc75-lV515Bqh-zm0Smb7EA6Ko"/>
+<div>
+<p class="text-sm font-bold text-navy">Stella Yu</p>
+<p class="text-xs text-gray-400">Principal @ Stella Results</p>
+</div>
+</div>
+</div>
+<!-- Testimonial 3 -->
+<div class="p-8 bg-surface rounded-xl border border-gray-100 relative">
+<span class="absolute top-4 left-4 text-6xl text-blue-200 opacity-30 font-serif">"</span>
+<p class="text-sm text-gray-600 mb-8 leading-relaxed relative z-10">
+            This is the most powerful monitoring tool I've used in years. It allows us to achieve world-class SLAs with our enterprise customers.
+          </p>
+<div class="flex items-center gap-4">
+<img alt="User" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtLotBZwlkRgF7clYPzoCgUpqGYGoVwffm6Vdx9jcRlqBmNFSNPonIRVU3cEnGzf4iGb9EOTXnxDQhyY3LHmipm8H3nSsJn1RAH-3il_fnkFEhPj7GjTmJgEJwsE8RukSwdNY7hhSnQjwhurjQO9H-jZ6uUxs74HLgA5gDNwXlEYxnEApcjidVp34FFbAZASHg816-Y-nBu7gbxEbR6VYBJOsvkHMaYKsaTfv8AYu-mQDW1e_XAmoUDmlPkW2HIyTGurFf7MsooBs"/>
+<div>
+<p class="text-sm font-bold text-navy">Jake Schmidt</p>
+<p class="text-xs text-gray-400">Chief Ops Officer @ Parzival</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Testimonials -->
+<!-- BEGIN: FAQ -->
+<section class="py-24 bg-surface">
+<div class="max-w-3xl mx-auto px-4">
+<div class="text-center mb-16">
+<p class="text-primary font-semibold text-sm mb-4">FAQs</p>
+<h2 class="text-4xl font-bold text-navy">Frequently Asked Questions</h2>
+</div>
+<div class="space-y-4">
+<!-- FAQ Item -->
+<details class="group bg-white border border-gray-100 rounded-lg p-6 [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between cursor-pointer">
+<h3 class="text-sm font-semibold text-navy">Where does StatusPing get its information from?</h3>
+<span class="ml-4 transition-transform group-open:rotate-180"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></span>
+</summary>
+<p class="mt-4 text-sm text-gray-500 leading-relaxed">StatusPing uses a global network of over 40 edge nodes to probe your endpoints. This ensures that you get a true representation of global availability, not just a single-point view.</p>
+</details>
+<!-- FAQ Item 2 -->
+<details class="group bg-white border border-gray-100 rounded-lg p-6 [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between cursor-pointer">
+<h3 class="text-sm font-semibold text-navy">How is my data protected?</h3>
+<span class="ml-4 transition-transform group-open:rotate-180"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></span>
+</summary>
+<p class="mt-4 text-sm text-gray-500 leading-relaxed">We use enterprise-grade encryption and are SOC2 Type II compliant. Your endpoint data and internal logs are siloed and protected with strict access controls.</p>
+</details>
+<!-- FAQ Item 3 -->
+<details class="group bg-white border border-gray-100 rounded-lg p-6 [&amp;_summary::-webkit-details-marker]:hidden">
+<summary class="flex items-center justify-between cursor-pointer">
+<h3 class="text-sm font-semibold text-navy">Does StatusPing offer plans for teams?</h3>
+<span class="ml-4 transition-transform group-open:rotate-180"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></span>
+</summary>
+<p class="mt-4 text-sm text-gray-500 leading-relaxed">Yes! Our Enterprise and Pro plans include unlimited team members with granular permission settings and SSO support.</p>
+</details>
+</div>
+</div>
+</section>
+<!-- END: FAQ -->
+<!-- BEGIN: CTA Section -->
+<section class="py-24 bg-white px-4">
+<div class="max-w-5xl mx-auto bg-gray-50 rounded-3xl p-12 text-center border border-gray-100">
+<h2 class="text-4xl font-bold text-navy mb-4">Ready to Close More Customers?</h2>
+<p class="text-gray-500 mb-8">Start your free trial today. No credit card required.</p>
+<a class="inline-block px-10 py-4 bg-primary text-white font-bold rounded-custom hover:bg-blue-700 transition-all shadow-lg shadow-blue-100" href="#">Try StatusPing for Free</a>
+<div class="mt-16 bg-white rounded-xl shadow-lg border border-gray-100 p-4 max-w-3xl mx-auto">
+</div>
+</div>
+</section>
+<!-- END: CTA Section -->
+<!-- BEGIN: Footer -->
+<footer class="bg-white border-t border-gray-100 py-16">
+<div class="max-w-7xl mx-auto px-4">
+<div class="grid md:grid-cols-4 gap-12 mb-12">
+<div class="col-span-1">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-6 h-6 bg-primary rounded flex items-center justify-center">
+<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-lg font-bold text-navy">StatusPing</span>
+</div>
+<p class="text-xs text-gray-400 leading-relaxed">548 Market St, PMB 31541<br/>San Francisco, CA 94104</p>
+</div>
+<div class="md:col-start-3 space-y-2">
+<h4 class="text-sm font-bold text-navy mb-4">Platform</h4>
+<a class="block text-sm text-gray-500 hover:text-primary" href="#">Status Agent</a>
+<a class="block text-sm text-gray-500 hover:text-primary" href="#">How it works</a>
+<a class="block text-sm text-gray-500 hover:text-primary" href="#">Integrations</a>
+</div>
+<div class="space-y-2">
+<h4 class="text-sm font-bold text-navy mb-4">Resources</h4>
+<a class="block text-sm text-gray-500 hover:text-primary" href="#">Blog</a>
+<a class="block text-sm text-gray-500 hover:text-primary" href="#">Pricing</a>
+<a class="block text-sm text-gray-500 hover:text-primary" href="#">Log in</a>
+</div>
+</div>
+<div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-gray-400">Copyright © 2024 StatusPing - Monitoring Agents for Teams</p>
+<div class="flex gap-6 text-xs text-gray-400">
+<a class="hover:text-primary" href="#">Terms and conditions</a>
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>
