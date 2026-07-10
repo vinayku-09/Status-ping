@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, HelpCircle, Plus, LogOut } from 'lucide-react';
+import { Bell, HelpCircle, Plus, LogOut, CheckCircle2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -11,23 +11,22 @@ export function Topbar() {
   const pathname = usePathname();
   const { logout } = useAuth();
   
-  // Generate breadcrumbs from pathname
+  // Generate high-contrast functional breadcrumbs
   const generateBreadcrumbs = () => {
     const paths = pathname.split('/').filter(p => p !== '');
-    if (paths.length <= 1) return null; // Just /dashboard
+    if (paths.length <= 1) return <span className="text-[13px] font-bold text-[var(--color-text-primary)] tracking-tight">Workspace Root</span>;
     
-    // Skip 'dashboard' in display
     const crumbs = paths.slice(1).map((path, i, arr) => {
       const isLast = i === arr.length - 1;
       const title = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
       
       return (
         <React.Fragment key={path}>
-          {i > 0 && <span className="text-[var(--color-text-tertiary)] mx-2">/</span>}
+          {i > 0 && <span className="text-[var(--color-text-tertiary)] mx-2 font-light text-xs">/</span>}
           {isLast ? (
-            <span className="text-[var(--color-text-primary)] font-medium text-[13px]">{title}</span>
+            <span className="text-[var(--color-text-primary)] font-bold text-[13px] tracking-tight">{title}</span>
           ) : (
-            <span className="text-[var(--color-text-secondary)] text-[13px]">{title}</span>
+            <span className="text-[var(--color-text-secondary)] font-semibold text-[13px] tracking-tight">{title}</span>
           )}
         </React.Fragment>
       );
@@ -37,48 +36,54 @@ export function Topbar() {
   };
 
   return (
-    <header className="h-[var(--topbar-height)] sticky top-0 z-30 flex items-center justify-between px-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-b border-[var(--color-border)]">
+    /* FIXED: Removed /80 opacity modifier and backdrop-blur to ensure a 100% solid white surface */
+    /* Force absolute solid native Tailwind white, discarding all variables */
+<header className="h-[var(--topbar-height)] sticky top-0 z-30 flex items-center justify-between px-6 bg-white border-b border-slate-200 shadow-xs">
       
-      {/* Left: Breadcrumbs */}
-      <div className="flex-1 flex items-center">
+      {/* Left Boundary: Navigation Context Breadcrumb Engine */}
+      <div className="flex-1 flex items-center min-w-0">
         {generateBreadcrumbs()}
       </div>
       
-      {/* Center: Contextual Status (mocked for now) */}
+      {/* Center Boundary: Real-Time Active Infrastructure Health State */}
       <div className="hidden md:flex flex-1 items-center justify-center">
-        {pathname.includes('/monitors/') && pathname.split('/').length > 3 && (
-          <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-up-subtle)] border border-[var(--color-up)]/20 rounded-full">
-            <span className="h-2 w-2 rounded-full bg-[var(--color-up)] animate-[status-pulse_2.5s_ease-in-out_infinite]" />
-            <span className="text-[12px] font-medium text-[var(--color-up-text)]">api.example.com is Operational</span>
+        {pathname.includes('/monitors') && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full shadow-xs">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span className="text-xs font-bold text-emerald-700 tracking-tight">All Operations Normal</span>
           </div>
         )}
       </div>
       
-      {/* Right: Actions */}
-      <div className="flex-1 flex items-center justify-end gap-4">
-        <button className="relative p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-raised)] rounded-full transition-colors">
-          <Bell className="h-[18px] w-[18px]" strokeWidth={2} />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-[var(--color-down)] rounded-full border-2 border-[var(--color-surface)]" />
+      {/* Right Boundary: Contextual Action Group Matrix */}
+      <div className="flex-1 flex items-center justify-end gap-3">
+        {/* Alerts Center Feed Trigger */}
+        <button className="relative p-2 text-[var(--color-text-secondary)] hover:bg-[#f8fbff] hover:text-[var(--color-text-primary)] border border-transparent hover:border-[var(--color-border)] rounded-xl transition-all shadow-xs group">
+          <Bell className="h-4 w-4 transition-transform group-hover:rotate-12" strokeWidth={2} />
+          <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-rose-500 rounded-full border border-[var(--color-surface)] shadow-xs" />
         </button>
         
-        <button className="p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-raised)] rounded-full transition-colors hidden sm:block">
-          <HelpCircle className="h-[18px] w-[18px]" strokeWidth={2} />
+        {/* Support Documentation Trigger */}
+        <button className="p-2 text-[var(--color-text-secondary)] hover:bg-[#f8fbff] hover:text-[var(--color-text-primary)] border border-transparent hover:border-[var(--color-border)] rounded-xl transition-all shadow-xs hidden sm:block">
+          <HelpCircle className="h-4 w-4" strokeWidth={2} />
         </button>
 
+        {/* Global Exit Session Gate */}
         <button
           onClick={logout}
-          title="Log out"
-          className="p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-down-subtle)] hover:text-[var(--color-down-text)] rounded-full transition-colors"
+          title="Disconnect operational session"
+          className="p-2 text-[var(--color-text-secondary)] hover:bg-rose-50 hover:text-rose-600 border border-transparent hover:border-rose-100 rounded-xl transition-all shadow-xs"
         >
-          <LogOut className="h-[18px] w-[18px]" strokeWidth={2} />
+          <LogOut className="h-4 w-4" strokeWidth={2} />
         </button>
         
-        <div className="h-6 w-px bg-[var(--color-border)] hidden sm:block mx-1" />
+        <div className="h-5 w-px bg-[var(--color-border)] hidden sm:block mx-0.5" />
         
+        {/* Primary Command Trigger */}
         <Link href="/dashboard/monitors/new">
-          <Button variant="primary" size="sm" className="gap-1">
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">New Monitor</span>
+          <Button variant="primary" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-1.5 h-9 rounded-xl shadow-sm border border-blue-500/10 flex items-center gap-1.5 tracking-tight px-3.5">
+            <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+            <span className="hidden sm:inline">Add Monitor</span>
           </Button>
         </Link>
       </div>
