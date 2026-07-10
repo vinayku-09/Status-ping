@@ -1,26 +1,451 @@
 @import "tailwindcss";
 
+/* ============================================================
+   StatusPing Design System — "Precision Dark"
+   ============================================================ */
+
+/* ─── Light Mode Palette ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Canvas & Surface */
+  --color-canvas: #F7F8FA;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #F0F2F5;
+  --color-border: #E2E4E9;
+  --color-border-strong: #C8CDD8;
+
+  /* Text */
+  --color-text-primary: #0D0E14;
+  --color-text-secondary: #4A5166;
+  --color-text-tertiary: #8B91A7;
+  --color-text-inverse: #FFFFFF;
+
+  /* Brand */
+  --color-brand: #5B5BD6;
+  --color-brand-hover: #4747B8;
+  --color-brand-subtle: #EDEDFB;
+  --color-brand-text: #3D3DAF;
+
+  /* Status — Operational */
+  --color-up: #18A058;
+  --color-up-subtle: #E8F7EE;
+  --color-up-text: #0E6B35;
+
+  /* Status — Down */
+  --color-down: #D92D20;
+  --color-down-subtle: #FEF3F2;
+  --color-down-text: #951B12;
+
+  /* Status — Degraded */
+  --color-degraded: #DC6803;
+  --color-degraded-subtle: #FFF6ED;
+  --color-degraded-text: #93370D;
+
+  /* Status — Pending */
+  --color-pending: #6172F3;
+  --color-pending-subtle: #EEF4FF;
+  --color-pending-text: #3538CD;
+
+  /* Status — Paused */
+  --color-paused: #667085;
+  --color-paused-subtle: #F2F4F7;
+  --color-paused-text: #344054;
+
+  /* Charts */
+  --color-chart-1: #5B5BD6;
+  --color-chart-2: #18A058;
+  --color-chart-3: #DC6803;
+  --color-chart-4: #9747FF;
+  --color-chart-5: #00A3BF;
+
+  /* Utility */
+  --color-focus-ring: rgba(91, 91, 214, 0.4);
+  --color-overlay: rgba(13, 14, 20, 0.5);
+
+  /* Shadows — light */
+  --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.05);
+  --shadow-glow-brand: 0 0 0 1px rgba(91,91,214,0.15), 0 4px 16px rgba(91,91,214,0.08);
+  --shadow-glow-up: 0 0 0 1px rgba(24,160,88,0.15), 0 4px 16px rgba(24,160,88,0.06);
+  --shadow-glow-down: 0 0 0 1px rgba(217,45,32,0.15), 0 4px 16px rgba(217,45,32,0.06);
 }
 
+/* ─── Dark Mode Palette ─── */
+.dark {
+  --color-canvas: #0A0B10;
+  --color-surface: #111218;
+  --color-surface-raised: #1A1C24;
+  --color-border: #22252F;
+  --color-border-strong: #2E3140;
+
+  --color-text-primary: #F1F2F5;
+  --color-text-secondary: #9EA6BC;
+  --color-text-tertiary: #545D73;
+  --color-text-inverse: #0D0E14;
+
+  --color-brand: #7B7BEF;
+  --color-brand-hover: #9999F5;
+  --color-brand-subtle: #1A1A3A;
+  --color-brand-text: #A5A5F7;
+
+  --color-up: #1FBF6A;
+  --color-up-subtle: #0B2318;
+  --color-up-text: #52D68A;
+
+  --color-down: #F04438;
+  --color-down-subtle: #2C0E0B;
+  --color-down-text: #F97066;
+
+  --color-degraded: #F79009;
+  --color-degraded-subtle: #2C1A00;
+  --color-degraded-text: #FDB022;
+
+  --color-pending: #6172F3;
+  --color-pending-subtle: #0F1535;
+  --color-pending-text: #8098F9;
+
+  --color-paused: #667085;
+  --color-paused-subtle: #1A1C24;
+  --color-paused-text: #98A2B3;
+
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.4), 0 1px 2px -1px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3);
+  --shadow-glow-brand: 0 0 0 1px rgba(123,123,239,0.3), 0 4px 16px rgba(123,123,239,0.15);
+  --shadow-glow-up: 0 0 0 1px rgba(31,191,106,0.3), 0 4px 16px rgba(31,191,106,0.12);
+  --shadow-glow-down: 0 0 0 1px rgba(240,68,56,0.3), 0 4px 16px rgba(240,68,56,0.12);
+}
+
+/* ─── Spacing Scale (4px base) ─── */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+}
+
+/* ─── Layout Constants ─── */
+:root {
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 64px;
+  --topbar-height: 56px;
+  --page-max-width: 1280px;
+  --content-max-width: 960px;
+  --panel-width: 360px;
+}
+
+/* ─── Border Radius ─── */
+:root {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+}
+
+/* ─── Motion ─── */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-linear: linear;
+
+  --duration-instant: 60ms;
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --duration-lazy: 500ms;
+}
+
+/* ─── Tailwind v4 Theme Integration ─── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-brand: var(--color-brand);
+  --color-brand-hover: var(--color-brand-hover);
+  --color-brand-subtle: var(--color-brand-subtle);
+  --color-brand-text: var(--color-brand-text);
+  --color-up: var(--color-up);
+  --color-up-subtle: var(--color-up-subtle);
+  --color-up-text: var(--color-up-text);
+  --color-down: var(--color-down);
+  --color-down-subtle: var(--color-down-subtle);
+  --color-down-text: var(--color-down-text);
+  --color-degraded: var(--color-degraded);
+  --color-degraded-subtle: var(--color-degraded-subtle);
+  --color-degraded-text: var(--color-degraded-text);
+  --color-pending: var(--color-pending);
+  --color-pending-subtle: var(--color-pending-subtle);
+  --color-pending-text: var(--color-pending-text);
+  --color-paused: var(--color-paused);
+  --color-paused-subtle: var(--color-paused-subtle);
+  --color-paused-text: var(--color-paused-text);
+  --color-chart-1: var(--color-chart-1);
+  --color-chart-2: var(--color-chart-2);
+  --color-chart-3: var(--color-chart-3);
+  --color-chart-4: var(--color-chart-4);
+  --color-chart-5: var(--color-chart-5);
+  --color-overlay: var(--color-overlay);
+  --color-focus-ring: var(--color-focus-ring);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ─── Keyframe Animations ─── */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.15); }
+}
+
+@keyframes bar-rise {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes underline-slide {
+  from { transform: scaleX(0); transform-origin: left; }
+  to { transform: scaleX(1); transform-origin: left; }
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
+/* ─── Base Styles ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* ─── Typography Utility Classes ─── */
+.text-display {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.text-title-xl {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.text-title-lg {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.text-title-md {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.text-title-sm {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.text-body-lg {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body-md {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body-sm {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.text-mono-lg {
+  font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-mono-md {
+  font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-mono-sm {
+  font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: var(--color-brand);
+  color: var(--color-text-inverse);
+}
+
+/* ─── Focus Ring ─── */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ─── Scrollbar (dark mode) ─── */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--color-canvas);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* ─── Skeleton Loading ─── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-raised) 25%,
+    var(--color-border) 50%,
+    var(--color-surface-raised) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
 }
