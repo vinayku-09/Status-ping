@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'dark' | 'light';
+type Theme = 'light';
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,36 +12,25 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Dashboard is light-only to match the landing page design
-  const [theme, setTheme] = useState<Theme>('light');
+  // Dashboard is light-only — dark mode removed entirely
+  const theme: Theme = 'light';
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem('statusping-theme') as Theme;
-    if (stored) {
-      setTheme(stored);
-    }
+    // Always force light mode: remove the .dark class regardless of any stored preference
+    document.documentElement.classList.remove('dark');
+    // Clear any old dark-mode preference that would be read on next load
+    localStorage.removeItem('statusping-theme');
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    localStorage.setItem('statusping-theme', theme);
-  }, [theme, mounted]);
-
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    // No-op: theme switching is disabled; UI is light-only
   };
 
-  // Prevent hydration mismatch flash by avoiding rendering until mounted
   if (!mounted) {
+    // Render children invisible to avoid flash; same strategy as before
     return <div style={{ visibility: 'hidden' }}>{children}</div>;
   }
 
