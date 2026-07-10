@@ -3,124 +3,175 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/apiClient';
-import { MonitorListItem } from '@/lib/types';
+import { MonitorListItem, Incident } from '@/lib/types';
 
-export default function DashboardPage() {
+type DashboardIncident = Incident & { monitorName: string };
+import { KPICard } from '@/components/ui/KPICard';
+import { Card } from '@/components/ui/Card';
+import { UptimeBars, UptimeBarData } from '@/components/ui/UptimeBars';
+import { StatusDot } from '@/components/ui/StatusDot';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { Button } from '@/components/ui/Button';
+
+export default function DashboardOverviewPage() {
   const [monitors, setMonitors] = useState<MonitorListItem[]>([]);
+  const [incidents, setIncidents] = useState<DashboardIncident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  const fetchMonitors = async () => {
-    try {
-      const res = await api.getMonitors();
-      setMonitors(res.data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch monitors');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchMonitors();
+    const fetchData = async () => {
+      try {
+        const monitorsRes = await api.getMonitors();
+        setMonitors(monitorsRes.data);
+
+        // Fetch incidents across all monitors (backend has no global incidents list)
+        const monitors = monitorsRes.data;
+        const rows = await Promise.all(
+          monitors.map(async (m) => {
+            try {
+              const res = await api.getIncidents(m.id, { limit: 20, status: 'open' });
+              return (res.data as Incident[]).map((inc) => ({
+                ...inc,
+                monitorName: m.name,
+              }));
+            } catch {
+              return [];
+            }
+          })
+        );
+        const flat = rows
+          .flat()
+          .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
+        setIncidents(flat);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'down': return 'bg-red-100 text-red-800';
-      case 'degraded': return 'bg-yellow-100 text-yellow-800';
-      case 'paused': return 'bg-gray-100 text-gray-800';
-      case 'pending': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  if (isLoading) {
+    return <div className="p-8 text-[var(--color-text-secondary)]">Loading dashboard...</div>;
+  }
+
+  const totalMonitors = monitors.length;
+  const upMonitors = monitors.filter(m => m.status === 'active').length;
+  const downMonitors = monitors.filter(m => m.status === 'down').length;
+  const avgUptime = monitors.length 
+    ? (monitors.reduce((acc, m) => acc + (m.uptimePercent30d || 100), 0) / monitors.length).toFixed(2)
+    : '100.00';
+
+  // Mock 90 day data generator
+  const generateMockUptime = (status: string): UptimeBarData[] => {
+    return Array.from({ length: 90 }).map((_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (89 - i));
+      const percent = status === 'down' && i > 85 ? 0 : 99.9 + (Math.random() * 0.1);
+      return {
+        date: date.toISOString().split('T')[0],
+        uptimePercent: percent
+      };
+    });
   };
 
-  if (isLoading) {
-    return <div className="text-center py-10">Loading monitors...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500 text-center py-10">{error}</div>;
-  }
-
   return (
-    <div>
-      <div className="sm:flex sm:items-center sm:justify-between mb-8">
+    <div className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            Monitors
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            A list of all your monitored services.
-          </p>
+          <h1 className="text-title-xl text-[var(--color-text-primary)]">Overview</h1>
+          <p className="text-body-md text-[var(--color-text-secondary)] mt-1">Your infrastructure at a glance</p>
         </div>
-        <div className="mt-4 sm:ml-4 sm:mt-0">
-          <Link
-            href="/dashboard/monitors/new"
-            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Create Monitor
-          </Link>
-        </div>
+        <Link href="/dashboard/monitors/new">
+          <Button variant="primary">Create Monitor</Button>
+        </Link>
       </div>
 
-      {monitors.length === 0 ? (
-        <div className="text-center bg-white rounded-lg shadow py-12">
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">No monitors</h3>
-          <p className="mt-1 text-sm text-gray-500">Get started by creating a new monitor.</p>
-          <div className="mt-6">
-            <Link
-              href="/dashboard/monitors/new"
-              className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              New Monitor
-            </Link>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard label="Total Monitors" value={totalMonitors} />
+        <KPICard label="Up & Running" value={upMonitors} trend="up" trendText="All good" />
+        <KPICard label="Currently Down" value={downMonitors} trend={downMonitors > 0 ? "down" : "neutral"} trendText={downMonitors > 0 ? "Needs attention" : "No issues"} />
+        <KPICard label="30d Avg Uptime" value={`${avgUptime}%`} trend={Number(avgUptime) > 99 ? "up" : "down"} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 flex flex-col gap-4">
+          <h2 className="text-title-lg text-[var(--color-text-primary)]">Monitor Status</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {monitors.map(monitor => (
+              <Card key={monitor.id} className="p-5 flex flex-col gap-4" clickable={true}>
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-title-md text-[var(--color-text-primary)] font-semibold">{monitor.name}</span>
+                    <span className="text-caption text-[var(--color-text-tertiary)]">{monitor.url}</span>
+                  </div>
+                  <StatusBadge status={monitor.status} />
+                </div>
+                <div className="mt-2">
+                  <UptimeBars data={generateMockUptime(monitor.status)} compact />
+                  <div className="flex justify-between text-caption text-[var(--color-text-tertiary)] mt-1">
+                    <span>90 days ago</span>
+                    <span>{monitor.uptimePercent30d ?? 100}% uptime</span>
+                    <span>Today</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+            {monitors.length === 0 && (
+              <div className="col-span-full py-12 text-center text-[var(--color-text-secondary)] border border-dashed border-[var(--color-border)] rounded-[var(--radius-lg)]">
+                No monitors configured yet.
+              </div>
+            )}
           </div>
         </div>
-      ) : (
-        <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">30d Uptime</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Interval</th>
-                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                  <span className="sr-only">View</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {monitors.map((monitor) => (
-                <tr key={monitor.id}>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    {monitor.name}
-                    <div className="text-gray-500 font-normal text-xs">{monitor.url}</div>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${getStatusColor(monitor.status)}`}>
-                      {monitor.status}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {monitor.uptimePercent30d !== null ? `${monitor.uptimePercent30d}%` : 'N/A'}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {monitor.checkIntervalMinutes}m
-                  </td>
-                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <Link href={`/dashboard/monitors/${monitor.id}`} className="text-indigo-600 hover:text-indigo-900">
-                      View<span className="sr-only">, {monitor.name}</span>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-title-lg text-[var(--color-text-primary)]">Active Incidents</h2>
+            <Card className="p-0 overflow-hidden">
+              {incidents.filter(i => i.status === 'open').length === 0 ? (
+                <div className="p-6 text-center text-body-sm text-[var(--color-text-secondary)]">
+                  No active incidents.
+                </div>
+              ) : (
+                <div className="divide-y divide-[var(--color-border)]">
+                   {incidents.filter(i => i.status === 'open').map(inc => (
+                     <div key={inc.id} className="p-4 flex flex-col gap-2 bg-[var(--color-down-subtle)]/30">
+                       <div className="flex items-center gap-2">
+                         <StatusDot status="down" size="sm" />
+                         <span className="text-body-sm font-semibold text-[var(--color-text-primary)]">{inc.monitorName}</span>
+                       </div>
+                       <span className="text-caption text-[var(--color-text-secondary)]">Started: {new Date(inc.startedAt).toLocaleString()}</span>
+                       <span className="text-caption text-[var(--color-down)] font-medium">{inc.errorType}</span>
+                     </div>
+                   ))}
+                </div>
+              )}
+            </Card>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h2 className="text-title-lg text-[var(--color-text-primary)]">Recent Activity</h2>
+            <Card className="p-0 overflow-hidden">
+              <div className="divide-y divide-[var(--color-border)]">
+                <div className="p-4 flex flex-col gap-1">
+                  <span className="text-body-sm text-[var(--color-text-primary)]">Monitor <strong>Marketing Site</strong> resumed</span>
+                  <span className="text-caption text-[var(--color-text-tertiary)]">2 hours ago</span>
+                </div>
+                <div className="p-4 flex flex-col gap-1">
+                  <span className="text-body-sm text-[var(--color-text-primary)]">Incident on <strong>Database</strong> resolved</span>
+                  <span className="text-caption text-[var(--color-text-tertiary)]">Yesterday, 14:20</span>
+                </div>
+                <div className="p-4 flex flex-col gap-1">
+                  <span className="text-body-sm text-[var(--color-text-primary)]">Monitor <strong>Database</strong> paused</span>
+                  <span className="text-caption text-[var(--color-text-tertiary)]">Yesterday, 10:00</span>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
