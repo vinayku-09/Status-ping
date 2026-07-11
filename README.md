@@ -34,31 +34,33 @@ Think of it as your own self-hosted UptimeRobot. No vendor lock-in, no monthly f
   />
 </p>
 
-### One full ping cycle
+The architecture below illustrates how **StatusPing** monitors services, detects outages, manages incidents, and delivers notifications using asynchronous background workers powered by **BullMQ**.
+
+### Monitoring & Incident Processing Flow
 
 ```mermaid
 graph TD
 
-    subgraph "Dashboard Layer"
-        User["User"]
-        Dashboard["Dashboard & API<br/>Next.js + Auth + REST API"]
+    subgraph "Client Application"
+        User["👤 User"]
+        Dashboard["Dashboard & API<br/>Next.js • Auth.js • REST API"]
     end
 
-    subgraph "Infrastructure"
-        Postgres[("PostgreSQL")]
-        Redis[("Redis")]
-        Scheduler["BullMQ Scheduler"]
+    subgraph "Core Infrastructure"
+        Postgres[("PostgreSQL<br/>Users • Monitors • Ping Logs • Incidents")]
+        Redis[("Redis<br/>Queues • Cache • Rate Limits")]
+        Scheduler["BullMQ Scheduler<br/>Schedules Monitoring Jobs"]
     end
 
-    subgraph "Worker Layer"
-        Ping["Ping Worker"]
-        Incident["Incident Engine"]
-        Notification["Notification Worker"]
+    subgraph "Background Processing Workers"
+        Ping["Ping Worker<br/>Performs HTTP/HTTPS Health Checks"]
+        Incident["Incident Engine<br/>Detects Failures & Manages Incidents"]
+        Notification["Notification Worker<br/>Sends Alerts & Recovery Notifications"]
     end
 
-    subgraph "External Systems"
-        Service["Monitored Services"]
-        Email["Email / Webhooks"]
+    subgraph "External Services"
+        Service["Monitored Services<br/>Websites & APIs"]
+        Email["Email & Webhook Providers"]
         Status["Public Status Page"]
     end
 
@@ -73,17 +75,18 @@ graph TD
     Scheduler --> Notification
 
     Ping -->|"HTTP Health Checks"| Service
-    Ping -->|"Store Ping Logs"| Postgres
+    Ping -->|"Store Ping Results"| Postgres
 
-    Incident -->|"Create / Resolve Incidents"| Postgres
+    Incident -->|"Open / Resolve Incidents"| Postgres
 
-    Notification -->|"Email Alerts"| Email
-    Notification -->|"Cooldown"| Redis
+    Notification -->|"Email & Webhook Alerts"| Email
+    Notification -->|"Cooldown Tracking"| Redis
 
-    Postgres -->|"Monitoring & Incident Data"| Status
+    Postgres -->|"Live Status & History"| Status
 ```
 
 ---
+
 
 ## Key Features
 
@@ -342,3 +345,4 @@ An in-memory counter resets on every worker restart and cannot be shared across 
 ## License
 
 MIT
+
