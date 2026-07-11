@@ -38,7 +38,7 @@ export default function MonitorsListPage() {
     return Array.from({ length: 30 }).map((_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - (29 - i));
-      let percent = status === 'down' && i > 25 ? 0 : 99.9 + (Math.random() * 0.1);
+      const percent = status === 'down' && i > 25 ? 0 : 99.9 + (Math.random() * 0.1);
       return {
         date: date.toISOString().split('T')[0],
         uptimePercent: percent

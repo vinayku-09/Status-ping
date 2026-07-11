@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Activity, AlertTriangle, Settings2, Globe, Command, Hexagon, CornerDownLeft } from 'lucide-react';
+import { Search, Activity, AlertTriangle, Settings2, Globe, Hexagon, CornerDownLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CommandPaletteProps {
@@ -52,7 +52,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        isOpen ? onClose() : document.dispatchEvent(new CustomEvent('open-command-palette'));
+        if (isOpen) {
+          onClose();
+        } else {
+          document.dispatchEvent(new CustomEvent('open-command-palette'));
+        }
       }
       if (!isOpen) return;
 

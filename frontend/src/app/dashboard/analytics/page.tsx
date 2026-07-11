@@ -76,15 +76,30 @@ export default function AnalyticsPage() {
     loadMonitors();
   }, []);
 
+  // Filter monitors dynamically via search string
+  const filteredMonitors = useMemo(() => {
+    return monitors.filter(m => 
+      m.name.toLowerCase().includes(monitorSearch.toLowerCase())
+    );
+  }, [monitors, monitorSearch]);
+
+  // Derive a valid selection: fall back to the first filtered monitor when the
+  // current selection is no longer present in the filtered list.
+  const effectiveSelectedId = useMemo(
+    () => (filteredMonitors.some(m => m.id === selectedId) ? selectedId : (filteredMonitors[0]?.id ?? '')),
+    [filteredMonitors, selectedId]
+  );
+
   // Core data load action for metrics and logs
   const loadAnalyticsData = useCallback(async (showLoadingIndicator = true) => {
-    if (!selectedId) return;
+    if (!effectiveSelectedId) return;
+    const id = effectiveSelectedId;
     if (showLoadingIndicator) setIsLoading(true);
     setError('');
     try {
       const [rtRes, logsRes] = await Promise.all([
-        api.getResponseTimes(selectedId, { days }),
-        api.getPingLogs(selectedId, { limit: 100 }),
+        api.getResponseTimes(id, { days }),
+        api.getPingLogs(id, { limit: 100 }),
       ]);
       setStats(rtRes.data);
       setPingLogs(logsRes.data);
@@ -94,32 +109,20 @@ export default function AnalyticsPage() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [selectedId, days]);
+  }, [effectiveSelectedId, days]);
 
-  // Hook telemetry data load to changes
+  // Load telemetry whenever the selected monitor or range changes.
+  // Deferred to a microtask so state updates occur outside the effect body.
   useEffect(() => {
-    loadAnalyticsData(true);
-  }, [loadAnalyticsData]);
+    if (!effectiveSelectedId) return;
+    void Promise.resolve().then(() => loadAnalyticsData(true));
+  }, [loadAnalyticsData, effectiveSelectedId]);
 
   // Manual explicit refresh command action
   const handleManualRefresh = () => {
     setIsRefreshing(true);
     loadAnalyticsData(false);
   };
-
-  // Filter monitors dynamically via search string
-  const filteredMonitors = useMemo(() => {
-    return monitors.filter(m => 
-      m.name.toLowerCase().includes(monitorSearch.toLowerCase())
-    );
-  }, [monitors, monitorSearch]);
-
-  // Handle auto-select correction if current monitor drops off the search filter list
-  useEffect(() => {
-    if (filteredMonitors.length > 0 && !filteredMonitors.some(m => m.id === selectedId)) {
-      setSelectedId(filteredMonitors[0].id);
-    }
-  }, [filteredMonitors, selectedId]);
 
   // Compute operational overview summaries
   const { avgUptime, avgP95, totalChecks, upChecks } = useMemo(() => {
@@ -175,7 +178,7 @@ export default function AnalyticsPage() {
 
           {/* Targeted Monitor Selector Match Dropdown */}
           <select
-            value={selectedId}
+            value={effectiveSelectedId}
             onChange={(e) => setSelectedId(e.target.value)}
             className="sm:w-64 px-3 py-2 text-sm font-semibold bg-white text-slate-900 rounded-xl border border-slate-200 shadow-xs focus:border-blue-500 focus:outline-none transition-colors"
           >
@@ -215,7 +218,7 @@ export default function AnalyticsPage() {
             variant="secondary"
             size="sm"
             onClick={handleManualRefresh}
-            disabled={isRefreshing || !selectedId}
+            disabled={isRefreshing || !effectiveSelectedId}
             className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded-xl px-3 flex items-center gap-1.5 h-9 font-semibold text-xs shadow-xs"
           >
             <RefreshCw className={`h-3.5 w-3.5 text-slate-500 ${isRefreshing ? 'animate-spin' : ''}`} />

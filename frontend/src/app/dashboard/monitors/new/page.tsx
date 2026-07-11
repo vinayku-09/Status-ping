@@ -30,8 +30,8 @@ export default function CreateMonitorPage() {
     try {
       const res = await api.createMonitor(formData);
       router.push(`/dashboard/monitors/${res.data.id}`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to create monitor');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create monitor');
       setIsLoading(false);
     }
   };
@@ -120,7 +120,7 @@ export default function CreateMonitorPage() {
                 </span>
               </label>
               <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 ml-7">
-                If enabled, this monitor's uptime will be visible to anyone viewing your public status page.
+                If enabled, this monitor&apos;s uptime will be visible to anyone viewing your public status page.
               </p>
             </div>
           </div>

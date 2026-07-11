@@ -140,7 +140,7 @@ export default function StatusPagesPage() {
         <h2 className="text-title-md text-[var(--color-text-primary)]">Monitors</h2>
         <Card className="p-0 divide-y divide-[var(--color-border)]">
           {data.monitors.map((m) => {
-            const isUp = m.status === 'active' || m.status === 'operational';
+            const isUp = m.status === 'active';
             const isDegraded = m.status === 'degraded';
             const statusColor = isUp
               ? 'var(--color-up)'
