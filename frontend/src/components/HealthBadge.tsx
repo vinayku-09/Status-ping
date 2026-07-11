@@ -17,7 +17,7 @@ export function HealthBadge() {
       try {
         const res = await api.getHealth();
         setHealth(res);
-      } catch (err) {
+      } catch {
         setHealth({ status: 'error', postgres: 'disconnected', redis: 'disconnected' });
       }
     };

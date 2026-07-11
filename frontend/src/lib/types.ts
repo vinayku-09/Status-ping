@@ -266,7 +266,7 @@ export interface StatusMonitor {
   id: string;
   name: string;
   url: string;
-  status: string;
+  status: MonitorStatus;
   uptime90d: Array<{
     date: string;
     uptimePercent: number | null;
