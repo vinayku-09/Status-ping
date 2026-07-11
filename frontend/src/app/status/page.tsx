@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/apiClient';
 import { StatusPageData } from '@/lib/types';
 import { UptimeBars } from '@/components/ui/UptimeBars';
@@ -15,9 +16,9 @@ export default function PublicStatusPage() {
       try {
         const res = await api.getStatusPage();
         setData(res.data);
-      } catch (err: any) {
-        setError('Failed to load status page');
-      } finally {
+    } catch {
+      setError('Failed to load status page');
+    } finally {
         setIsLoading(false);
       }
     };
@@ -118,7 +119,7 @@ export default function PublicStatusPage() {
           <div className="bg-[var(--color-surface)] shadow-[var(--shadow-sm)] rounded-[var(--radius-lg)] border border-[var(--color-border)] divide-y divide-[var(--color-border)]">
             {data.monitors.map(monitor => {
               
-              const isUp = monitor.status === 'active' || monitor.status === 'operational';
+              const isUp = monitor.status === 'active';
               const isDegraded = monitor.status === 'degraded';
               const statusColor = isUp ? 'var(--color-up)' : (isDegraded ? 'var(--color-degraded)' : 'var(--color-down)');
               const statusText = isUp ? 'Operational' : (isDegraded ? 'Degraded' : 'Outage');
@@ -159,9 +160,9 @@ export default function PublicStatusPage() {
 
         {/* Footer */}
         <div className="mt-8 pt-8 border-t border-[var(--color-border)] text-center">
-          <a href="/" className="text-caption text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors inline-flex items-center gap-1.5">
+          <Link href="/" className="text-caption text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors inline-flex items-center gap-1.5">
             Powered by <strong className="font-semibold">StatusPing</strong>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

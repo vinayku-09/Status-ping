@@ -3,12 +3,9 @@
 import * as React from "react";
 import {
   Activity,
-  ArrowRight,
   ArrowUpRight,
   BarChart3,
   Bell,
-  Calendar,
-  CheckCircle,
   ChevronDown,
   ChevronLeft,
   Cloud,
@@ -22,11 +19,8 @@ import {
   Link,
   Mail,
   Megaphone,
-  Menu,
-  Monitor,
   MoreVertical,
   Network,
-  Palette,
   Pencil,
   Plug,
   Plus,
@@ -41,8 +35,6 @@ import {
   Terminal,
   Users,
   Webhook,
-  X,
-  XCircle,
   Zap,
 } from "lucide-react";
 import {
@@ -461,14 +453,14 @@ function GlowingCard({ icon, title, description, large }: { icon: React.ReactNod
 
 function FeatureGrid() {
   const features = [
-    ["Multi-region monitoring", "12 global locations check simultaneously to eliminate false positives.", <Cloud className="h-6 w-6" />],
-    ["SSL certificate alerts", "Get warned 30 days before your cert expires. Never get caught off guard.", <Sliders className="h-6 w-6" />],
-    ["Custom domains", "Host your status page on status.yourcompany.com with a one-click DNS setup.", <Link className="h-6 w-6" />],
-    ["Full API access", "REST API to manage monitors, incidents, and status pages programmatically.", <Terminal className="h-6 w-6" />],
-    ["Webhook support", "Fire webhooks on any status change. Integrate with any tool in your stack.", <Webhook className="h-6 w-6" />],
-    ["24/7 human support", "Real people available around the clock. Average response under 4 minutes.", <HelpCircle className="h-6 w-6" />],
-    ["Team roles & permissions", "Granular access control. Invite unlimited teammates with viewer or admin roles.", <Heart className="h-6 w-6" />],
-    ["Full audit logs", "Complete trail for every action. Know exactly who changed what and when.", <DollarSign className="h-6 w-6" />],
+    ["Multi-region monitoring", "12 global locations check simultaneously to eliminate false positives.", <Cloud className="h-6 w-6" key="multi-region" />],
+    ["SSL certificate alerts", "Get warned 30 days before your cert expires. Never get caught off guard.", <Sliders className="h-6 w-6" key="ssl" />],
+    ["Custom domains", "Host your status page on status.yourcompany.com with a one-click DNS setup.", <Link className="h-6 w-6" key="domains" />],
+    ["Full API access", "REST API to manage monitors, incidents, and status pages programmatically.", <Terminal className="h-6 w-6" key="api" />],
+    ["Webhook support", "Fire webhooks on any status change. Integrate with any tool in your stack.", <Webhook className="h-6 w-6" key="webhook" />],
+    ["24/7 human support", "Real people available around the clock. Average response under 4 minutes.", <HelpCircle className="h-6 w-6" key="support" />],
+    ["Team roles & permissions", "Granular access control. Invite unlimited teammates with viewer or admin roles.", <Heart className="h-6 w-6" key="roles" />],
+    ["Full audit logs", "Complete trail for every action. Know exactly who changed what and when.", <DollarSign className="h-6 w-6" key="audit" />],
   ] as const;
   return <div className="mx-auto max-w-6xl px-6 pb-24"><div className="overflow-hidden rounded-xl border border-slate-100 bg-white"><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">{features.map(([title, description, icon], i) => <div key={title} className={`group relative border-slate-100 p-6 transition-all hover:bg-blue-50/30 ${i % 4 !== 3 ? "lg:border-r" : ""} ${i < 4 ? "lg:border-b" : ""} border-b`}><div className="absolute left-0 top-0 h-full w-[2px] bg-transparent transition-colors group-hover:bg-blue-500" /><div className="mb-4 text-blue-500">{icon}</div><h3 className="text-base font-semibold text-slate-800">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-500">{description}</p></div>)}</div></div></div>;
 }
