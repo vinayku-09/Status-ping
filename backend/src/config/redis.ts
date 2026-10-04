@@ -23,6 +23,19 @@ export const redis = new Redis(env.REDIS_URL, {
   },
 });
 
+/**
+ * Dedicated Redis connection for BullMQ
+ *
+ * BullMQ issues blocking commands (BRPOPLPUSH and friends) which ioredis only
+ * permits when maxRetriesPerRequest is null. The shared client above sets it to
+ * 3 on purpose so ordinary commands fail fast instead of hanging, so queues and
+ * workers need their own connection.
+ */
+export const bullRedis = new Redis(env.REDIS_URL, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+
 // Connection event handlers
 redis.on('connect', () => {
   logger.info('Redis connection established');

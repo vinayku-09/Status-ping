@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import { redis } from '../config/redis.js';
+import { redis, bullRedis } from '../config/redis.js';
 import { prisma } from '../config/prisma.js';
 import { env } from '../config/env.js';
 import { sendEmailNotification, sendWebhookNotification } from '../services/notification.service.js';
@@ -221,7 +221,7 @@ async function processNotificationJob(job: Job<NotificationJobData>): Promise<vo
 
 export function createNotificationWorker(): Worker {
   const worker = new Worker<NotificationJobData>('notification-queue', processNotificationJob, {
-    connection: redis,
+    connection: bullRedis,
     concurrency: 3,
     lockDuration: 60000, // 60 seconds (emails can be slow)
   });

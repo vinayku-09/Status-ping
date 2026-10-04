@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import { redis } from '../config/redis.js';
+import { bullRedis } from '../config/redis.js';
 import { notificationQueue } from '../queues/index.js';
 import { evaluateIncident } from '../services/incident.service.js';
 import { createLogger } from '../lib/logger.js';
@@ -88,7 +88,7 @@ async function processIncidentJob(job: Job<IncidentJobData>): Promise<void> {
  */
 export function createIncidentWorker(): Worker {
   const worker = new Worker<IncidentJobData>('incident-queue', processIncidentJob, {
-    connection: redis,
+    connection: bullRedis,
     concurrency: 5,
     lockDuration: 30000, // 30 seconds
   });

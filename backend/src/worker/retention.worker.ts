@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import { redis } from '../config/redis.js';
+import { bullRedis } from '../config/redis.js';
 import { runRetention } from '../services/retention.service.js';
 import { createLogger } from '../lib/logger.js';
 
@@ -28,7 +28,7 @@ async function processRetentionJob(job: Job): Promise<void> {
 
 export function createRetentionWorker(): Worker {
   const worker = new Worker('retention-queue', processRetentionJob, {
-    connection: redis,
+    connection: bullRedis,
     concurrency: 1, // Only one retention job at a time
     lockDuration: 600000, // 10 minutes (retention can take a while)
   });

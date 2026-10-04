@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import { redis } from '../config/redis.js';
+import { bullRedis } from '../config/redis.js';
 import { prisma } from '../config/prisma.js';
 import { env } from '../config/env.js';
 import { incidentQueue } from '../queues/index.js';
@@ -175,7 +175,7 @@ async function processPingJob(job: Job<PingJobData>): Promise<void> {
  */
 export function createPingWorker(): Worker {
   const worker = new Worker<PingJobData>('ping-queue', processPingJob, {
-    connection: redis,
+    connection: bullRedis,
     concurrency: env.PING_WORKER_CONCURRENCY,
     lockDuration: 30000, // 30 seconds
     limiter: {

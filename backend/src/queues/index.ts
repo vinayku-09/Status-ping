@@ -4,7 +4,7 @@
  */
 
 import { Queue } from 'bullmq';
-import { redis } from '../config/redis.js';
+import { bullRedis } from '../config/redis.js';
 import { createLogger } from '../lib/logger.js';
 
 const logger = createLogger('api', 'queues');
@@ -13,7 +13,7 @@ const logger = createLogger('api', 'queues');
  * Ping queue - executes HTTP health checks
  */
 export const pingQueue = new Queue('ping-queue', {
-  connection: redis,
+  connection: bullRedis,
   defaultJobOptions: {
     attempts: 3,
     backoff: {
@@ -29,7 +29,7 @@ export const pingQueue = new Queue('ping-queue', {
  * Incident queue - evaluates and manages incidents
  */
 export const incidentQueue = new Queue('incident-queue', {
-  connection: redis,
+  connection: bullRedis,
   defaultJobOptions: {
     attempts: 5,
     backoff: {
@@ -45,7 +45,7 @@ export const incidentQueue = new Queue('incident-queue', {
  * Notification queue - sends email and webhook notifications
  */
 export const notificationQueue = new Queue('notification-queue', {
-  connection: redis,
+  connection: bullRedis,
   defaultJobOptions: {
     attempts: 5,
     backoff: {
@@ -61,7 +61,7 @@ export const notificationQueue = new Queue('notification-queue', {
  * Retention queue - data aggregation and cleanup
  */
 export const retentionQueue = new Queue('retention-queue', {
-  connection: redis,
+  connection: bullRedis,
   defaultJobOptions: {
     attempts: 3,
     backoff: {
