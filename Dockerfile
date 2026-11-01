@@ -5,16 +5,13 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install dependencies
-COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+COPY backend/package*.json ./
+RUN npm ci && npm cache clean --force
 
 # Copy source code
-COPY . .
+COPY backend/ ./
 
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build TypeScript
+# Generate Prisma client and build TypeScript
 RUN npm run build
 
 # ========================================

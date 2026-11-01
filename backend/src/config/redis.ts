@@ -16,6 +16,7 @@ export const redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
   lazyConnect: true,
+  connectTimeout: 5000,
   retryStrategy(times: number) {
     const delay = Math.min(times * 50, 2000);
     logger.warn({ times, delay }, 'Redis connection retry');
@@ -34,6 +35,7 @@ export const redis = new Redis(env.REDIS_URL, {
 export const bullRedis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
+  lazyConnect: process.env.VERCEL === '1',
 });
 
 // Connection event handlers

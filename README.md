@@ -305,27 +305,21 @@ Full OpenAPI spec available at `/api/docs`.
 
 ---
 
-## Deployment (Railway)
+## Deployment
 
-Two Railway services, one monorepo:
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full walkthrough.
 
-```bash
-# Service 1 — Next.js app
-railway up --service app
+- **Frontend:** Vercel, with **Root Directory** set to `frontend`.
+- **API:** Vercel, with **Root Directory** set to `backend`. `backend/vercel.json` wraps the Express app as a serverless function and bundles the Prisma engine.
+- **Worker:** the `worker` target of the root `Dockerfile`, on a long-running host (Render, Railway, Fly, or a VPS). The worker cannot run on Vercel.
 
-# Service 2 — BullMQ worker
-railway up --service worker
-```
-
-The Dockerfile uses multi-stage builds. Both services share the same Railway PostgreSQL and Redis add-ons. On worker startup, it reads all active monitors from PostgreSQL and re-registers BullMQ repeatable jobs — Redis data loss does not require manual intervention.
-
-CI/CD via GitHub Actions: push to `main` → Vitest + Playwright → Docker build → Railway deploy. Failing tests block the merge.
+Both the API and worker share a hosted PostgreSQL and Redis instance. On worker startup, it reads all active monitors from PostgreSQL and re-registers BullMQ repeatable jobs — Redis data loss does not require manual intervention.
 
 ---
 
 ## Design Decisions
 
-**Why a separate Railway service for the worker?**
+**Why a separate worker service?**
 BullMQ requires a long-running Node.js process. Vercel/serverless functions time out at 10 seconds and cannot run persistent background jobs. Separating the worker also means a slow batch of HTTP checks never blocks dashboard API responses.
 
 **Why BullMQ over `node-cron` or `setTimeout`?**

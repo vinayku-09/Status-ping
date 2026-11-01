@@ -76,7 +76,11 @@ export async function rateLimiter(
 
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof RateLimitError) {
+      return next(error);
+    }
+    logger.error({ err: error }, 'Rate limiter unavailable, allowing request');
+    return next();
   }
 }
 
@@ -123,6 +127,10 @@ export async function globalRateLimiter(
 
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof RateLimitError) {
+      return next(error);
+    }
+    logger.error({ err: error }, 'Global rate limiter unavailable, allowing request');
+    return next();
   }
 }
