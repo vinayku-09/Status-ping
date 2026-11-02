@@ -18,6 +18,12 @@ type IncidentWithMonitor = Incident & {
 let transporter: nodemailer.Transporter | null = null;
 
 function getTransporter(): nodemailer.Transporter {
+  if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS) {
+    throw new Error(
+      'SMTP is not configured. Set SMTP_HOST, SMTP_USER and SMTP_PASS to send email notifications.'
+    );
+  }
+
   if (!transporter) {
     transporter = nodemailer.createTransport({
       host: env.SMTP_HOST,
@@ -134,6 +140,10 @@ export async function sendEmailNotification(
 
   if (!config.email) {
     throw new Error('Email address not configured');
+  }
+
+  if (!env.SMTP_FROM) {
+    throw new Error('SMTP_FROM is not configured. Set SMTP_FROM to send email notifications.');
   }
 
   try {

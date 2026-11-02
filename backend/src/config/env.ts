@@ -21,12 +21,12 @@ const EnvSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters for security'),
   JWT_EXPIRES_IN: z.string().default('7d'),
 
-  // Email (Nodemailer SMTP)
-  SMTP_HOST: z.string().min(1, 'SMTP_HOST is required'),
+  // Email (Nodemailer SMTP) — optional so the API can boot without mail configured
+  SMTP_HOST: z.string().min(1).optional(),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
-  SMTP_USER: z.string().min(1, 'SMTP_USER is required'),
-  SMTP_PASS: z.string().min(1, 'SMTP_PASS is required'),
-  SMTP_FROM: z.string().email('SMTP_FROM must be a valid email address'),
+  SMTP_USER: z.string().min(1).optional(),
+  SMTP_PASS: z.string().min(1).optional(),
+  SMTP_FROM: z.string().email('SMTP_FROM must be a valid email address').optional(),
 
   // Webhooks
   WEBHOOK_ENCRYPTION_KEY: z.string().min(32, 'WEBHOOK_ENCRYPTION_KEY must be at least 32 characters'),
@@ -44,7 +44,7 @@ const EnvSchema = z.object({
 
 /**
  * Parsed and validated environment variables
- * @throws {ZodError} If validation fails, the error is logged and the process exits
+ * @throws {Error} If validation fails, listing the invalid variables
  */
 export type Env = z.infer<typeof EnvSchema>;
 
@@ -54,10 +54,11 @@ try {
   env = EnvSchema.parse(process.env);
 } catch (error) {
   if (error instanceof z.ZodError) {
-    console.error('❌ Environment validation failed:');
-    console.error(JSON.stringify(error.format(), null, 2));
-    console.error('\nPlease check your .env file and ensure all required variables are set.');
-    process.exit(1);
+    const details = error.issues
+      .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
+      .join('; ');
+    console.error(`Environment validation failed: ${details}`);
+    throw new Error(`Environment validation failed: ${details}`);
   }
   throw error;
 }
