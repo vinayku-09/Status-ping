@@ -6,19 +6,20 @@
 import pino from 'pino';
 import { env } from '../config/env.js';
 
+const usePrettyLogs = env.NODE_ENV !== 'production' && process.env.VERCEL !== '1';
+
 const rootLogger = pino({
   level: env.NODE_ENV === 'production' ? 'info' : 'debug',
-  transport:
-    env.NODE_ENV !== 'production'
-      ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'HH:MM:ss Z',
-            ignore: 'pid,hostname',
-          },
-        }
-      : undefined,
+  transport: usePrettyLogs
+    ? {
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          translateTime: 'HH:MM:ss Z',
+          ignore: 'pid,hostname',
+        },
+      }
+    : undefined,
   timestamp: pino.stdTimeFunctions.isoTime,
   formatters: {
     level: (label) => {
