@@ -36,7 +36,7 @@ describe('evaluateIncident', () => {
       id: 'monitor-1',
       userId: 'user-1',
       name: 'Test Monitor',
-      consecutiveFailures: 1,
+      consecutiveFailures: 0,
       failureThreshold: 2,
       status: 'active',
       deletedAt: null,
@@ -46,7 +46,7 @@ describe('evaluateIncident', () => {
       return callback({
         monitor: {
           findUnique: vi.fn().mockResolvedValue(mockMonitor),
-          update: vi.fn().mockResolvedValue({ ...mockMonitor, consecutiveFailures: 2 }),
+          update: vi.fn().mockResolvedValue({ ...mockMonitor, consecutiveFailures: 1 }),
         },
         incident: {
           findFirst: vi.fn(),

@@ -1,7 +1,7 @@
 # Multi-stage build for StatusPing
 # Targets: api, worker
 
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 WORKDIR /app
 
 # Install dependencies
@@ -17,7 +17,7 @@ RUN npm run build
 # ========================================
 # API Service
 # ========================================
-FROM node:20-alpine AS api
+FROM node:22-alpine AS api
 WORKDIR /app
 
 # Copy built artifacts and dependencies from base
@@ -38,7 +38,7 @@ CMD ["node", "dist/api/server.js"]
 # ========================================
 # Worker Service
 # ========================================
-FROM node:20-alpine AS worker
+FROM node:22-alpine AS worker
 WORKDIR /app
 
 # Copy built artifacts and dependencies from base

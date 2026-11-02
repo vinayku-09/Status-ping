@@ -31,7 +31,7 @@ describe('crypto helpers', () => {
     it('handle special characters', () => {
       const plaintext = '!@#$%^&*()_+-={}[]|:";\'<>?,./';
       const encrypted = encryptSecret(plaintext);
-      const decrypted = decryptSecret(plaintext);
+      const decrypted = decryptSecret(encrypted);
       expect(decrypted).toBe(plaintext);
     });
 

@@ -4,6 +4,7 @@
  */
 
 import { promises as dns } from 'dns';
+import net from 'net';
 import { createLogger } from './logger.js';
 
 const logger = createLogger('api', 'ssrf');
@@ -60,6 +61,11 @@ function extractHostname(url: string): string {
  * @throws Error if DNS resolution fails
  */
 async function resolveHostname(hostname: string): Promise<string[]> {
+  // IP literals do not need DNS resolution
+  if (net.isIP(hostname)) {
+    return [hostname];
+  }
+
   try {
     // Try IPv4 first
     const addresses = await dns.resolve4(hostname);
@@ -70,9 +76,8 @@ async function resolveHostname(hostname: string): Promise<string[]> {
       const addresses = await dns.resolve6(hostname);
       return addresses;
     } catch (ipv6Error) {
-      // If both fail, the hostname might be an IP address itself
-      // Return it as-is for validation
-      return [hostname];
+      // Fail closed: an unresolvable hostname cannot be validated as safe
+      throw new Error(`DNS resolution failed for ${hostname}`);
     }
   }
 }
